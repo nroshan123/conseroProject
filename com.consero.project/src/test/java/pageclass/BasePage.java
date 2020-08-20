@@ -50,6 +50,32 @@ public class BasePage {
   	
   	@FindBy(xpath = "//div[@class='ui-dialog-buttonset']//span[text()='Yes']")
   	WebElement confirmUiDialog;
+  	
+   //toaster
+	
+  	@FindBy(xpath = "//div[@id='toast-container']")
+  	WebElement toastContainer;
+  	
+  	@FindBy(xpath = "//div[@id='toast-container']//div[@class='toast toast-success']")
+  	WebElement toastSuccessContainer;
+  	
+  	@FindBy(xpath = "//div[@id='toast-container']//div[@class='toast toast-warning']")
+  	WebElement toastWarningContainer;
+  	
+  	@FindBy(xpath = "//div[@id='toast-container']//div[@class='toast toast-error']")
+  	WebElement toastErrorContainer;
+  	
+  	@FindBy(xpath = "//div[@id='toast-container']//div[@class='toast toast-success']//div[@class='toast-message']")
+  	WebElement toastSuccessMessage;
+  	
+  	@FindBy(xpath = "//div[@id='toast-container']//div[@class='toast toast-error']//div[@class='toast-message']")
+  	WebElement toastErrorMessage;
+  	
+  	@FindBy(xpath = "//div[@id='toast-container']//div[@class='toast toast-warning']//div[@class='toast-message']")
+  	WebElement toasterWarningMessage;
+  	
+  	@FindBy(xpath = "//div[@class='toaster-height']")
+  	WebElement toastContent;
 	
 	public BasePage(WebDriver driver) {
 		this.driver = driver;
@@ -152,5 +178,72 @@ public class BasePage {
 			}
 		}
 	}
-		
+	
+	// toaster methods
+
+	public boolean checkToasterExists() {
+		boolean isToasterExist = false;
+		if (this.isElementPresent(toastContainer, 60)) {
+			isToasterExist = true;
+		}
+		return isToasterExist;
+	}
+
+	public boolean checkWarningToasterExists() {
+		boolean isToasterExist = false;
+		if (this.isElementPresent(toastWarningContainer, 60)) {
+			isToasterExist = true;
+		}
+		return isToasterExist;
+	}
+
+	public boolean checkSuccessToasterExists() {
+		boolean isToasterExist = false;
+		if (this.isElementPresent(toastSuccessContainer, 30)) {
+			isToasterExist = true;
+		}
+		return isToasterExist;
+	}
+
+	public boolean checkErrorToasterExists() {
+		boolean isToasterExist = false;
+		if (this.isElementPresent(toastErrorContainer, 30)) {
+			isToasterExist = true;
+		}
+		return isToasterExist;
+	}
+
+	public String getToastSuccessMessage() {
+		return toastSuccessMessage.getText();
+	}
+
+	public String getToastErrorMessage() {
+		return toastErrorMessage.getText();
+	}
+
+	public String getToastWarningMessage() {
+		return toasterWarningMessage.getText();
+	}
+
+	public boolean checkSuccessMessage(String msg) {
+		if (this.checkSuccessToasterExists() && this.getToastSuccessMessage().equals(msg)) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean checkErrorMessage(String msg) {
+		if (this.checkErrorToasterExists() && this.getToastErrorMessage().equals(msg)) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean checkWarningMessage(String msg) {
+		if (this.checkWarningToasterExists() && this.getToastWarningMessage().contains(msg)) {
+			return true;
+		}
+		return false;
+	}
+
 }
