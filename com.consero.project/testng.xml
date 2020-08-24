@@ -5,7 +5,7 @@
 		<listener class-name="utility.TestListner"></listener>
 	</listeners>
 
-	<parameter name="appurl" value="https://consero-prod-beta.azurewebsites.net/" />
+	<parameter name="appurl" value="https://texpo-uat.eroms.works/" />
 	
 	<test name="Test">
 		<classes>

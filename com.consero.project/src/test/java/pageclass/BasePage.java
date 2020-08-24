@@ -42,10 +42,10 @@ public class BasePage {
   	
     //ui-dialog
   	
-  	@FindBy(xpath = "//div[contains(@class,'ui-dialog']")
+  	@FindBy(xpath = "//div[contains(@class,'ui-dialog')]")
   	WebElement uiDialog;
   	
-  	@FindBy(xpath = "//div[contains(@class,'ui-dialog']")
+  	@FindBy(xpath = "//div[contains(@class,'ui-dialog')]//div[contains(@class,'ui-dialog-content') and (contains(@id,'ui-id'))]")
   	WebElement uiDialogContent;
   	
   	@FindBy(xpath = "//div[@class='ui-dialog-buttonset']//span[text()='Yes']")
@@ -168,11 +168,11 @@ public class BasePage {
 	// ui-dialog function
 
 	public void clickOnConfirmDialog() {
-		confirmUiDialog.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", confirmUiDialog);
 	}
 
 	public void handleUiDialog(String content) {
-		if (this.isElementPresent(uiDialog, 40)) {
+		if (this.isElementPresent(uiDialogContent, 40)) {
 			if (uiDialogContent.getText().contains(content)) {
 				this.clickOnConfirmDialog();
 			}

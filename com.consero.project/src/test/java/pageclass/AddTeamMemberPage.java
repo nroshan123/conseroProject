@@ -116,16 +116,19 @@ public class AddTeamMemberPage extends BasePage{
 		companyDetails.click();
 	}
 	
-	public void setTeamMemberDetails(String user, String role,String title) {
+	public void setTeamMemberDetails(String user, String role,String title, String content) {
 		try {
 			this.clickOnUserDropdown();
 			this.setSearchResult(user);
 			this.clickOnUserResult();
+			handleUiDialog(content);
+			Thread.sleep(3000);
 			this.clickOnRoleDropdown();
 			this.setSearchResult(role);
 			this.clickOnRoleResult(role);
 			this.clickOnTitleDropdown();
 			this.clickOnTitleResult(title);
+			this.clickOnAdd();
 		} catch(Exception e) {
 			this.clickOnCompanyDetails();
 		}

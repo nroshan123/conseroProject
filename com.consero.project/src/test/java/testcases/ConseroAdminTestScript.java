@@ -15,13 +15,23 @@ import com.relevantcodes.extentreports.LogStatus;
 
 import basetest.BaseTest;
 import pageclass.BasePage;
+import pageclass.AddBulkUserPage;
+import pageclass.AddCloseTemplatePage;
 import pageclass.CompanyDetailsPage;
 import pageclass.CompanyListPage;
+import pageclass.ControlDockPage;
+import pageclass.DeactivateBulkUserPage;
 import pageclass.AddCompanyPage;
 import pageclass.AddLinkPage;
 import pageclass.AddTeamMemberPage;
+import pageclass.AddUserPage;
 import pageclass.HomePage;
+import pageclass.KickOffClosePage;
+import pageclass.KickOffsPage;
 import pageclass.LoginPage;
+import pageclass.ManageEmailAutomationPage;
+import pageclass.TemplateDetailsPage;
+import pageclass.UsersListPage;
 import pageclass.ViewEmailLogsPage;
 import utility.DataReader;
 import utility.ExtentTestManager;
@@ -39,10 +49,20 @@ public class ConseroAdminTestScript extends BaseTest {
 	AddTeamMemberPage addTeamMemberPageObj = null;
 	ViewEmailLogsPage viewEmailLogsPageObj = null;
 	AddLinkPage addLinkPageObj = null;
+	UsersListPage userListPageObj = null;
+	AddUserPage addUserPageObj = null;
+	AddBulkUserPage bulkUserPageObj = null;
+	DeactivateBulkUserPage deactivateBulkUserPageObj = null;
+	AddCloseTemplatePage addCloseTemplatePageObj = null;
+	TemplateDetailsPage templateDetailsPageObj = null;
+	KickOffClosePage kickOffClosePageObj = null;
+	ControlDockPage controlDockPageObj = null;
+	KickOffsPage kickOffPageObj = null; 
+	ManageEmailAutomationPage manageEmailPageObj = null;
 	
 	String sheetName = "credentials";
-	String adminUser = "", adminPassword = "";
-	String companyName= "automation_test_company_DAn";
+	String adminUser = "prasanna@thinkbridge.in", adminPassword = "Consero123$";
+	String companyName= "", username ="", emailTemplateName="";
 	
 	@BeforeMethod(alwaysRun = true)
 	public void setUp(Method method) {
@@ -59,13 +79,13 @@ public class ConseroAdminTestScript extends BaseTest {
 	@Test
 	public void loginTC(String appUrl) {
 		try {
-			List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
+			/*List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
 			for (int i = 0; i < TCData.size(); i++) {
 				if(TCData.get(i).get("role").equals("admin")) {
 					adminUser = TCData.get(i).get("email");
 					adminPassword = TCData.get(i).get("password");
 				}
-			}
+			}*/
 			loadConfig();
 			test.log(LogStatus.INFO, "Loading config file");
 			navigate(appUrl);
@@ -98,126 +118,243 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority = 2)
-	public void checkAccountsPaginationTC() {
-		companyListPageObj = new CompanyListPage(driver);
+	@Test(priority=2)
+	public void verifyUserListTC() {
+		homePageObj = new HomePage(driver);
+		userListPageObj = new UsersListPage(driver);
 		try {
+			homePageObj.clickOnUsers();
 			Thread.sleep(10000);
-			if(basePage.isElementPresent(companyListPageObj.companyListTable, 60)) {
-				test.log(LogStatus.INFO, "Company List loaded successfully. ");
-			} 
-			
-			if(basePage.pagination.size()>0) {
-				test.log(LogStatus.INFO, "Pagination Found.");
-				basePage.clickOnPagination();
+			if(basePage.isElementPresent(userListPageObj.pageTitle, 60)) {
+				test.log(LogStatus.INFO, "user page loaded successfully!!");
+				if(userListPageObj.isActiveUserSelected()) {
+					test.log(LogStatus.PASS, "active user is selected by default!!!");
+				}
+				
+				if(userListPageObj.isUserTableExist()) {
+					test.log(LogStatus.INFO, "user table displayed successfully!!");
+				}
+				
+				takeScreenshot();
+				userListPageObj.clickOnInactiveUser();
+				test.log(LogStatus.INFO, "selected Inactive users!!!");
+				takeScreenshot();
+				userListPageObj.clickOnBothUsers();
+				test.log(LogStatus.INFO, "selected both active and Inactive users!!!");
 			} else {
-				test.log(LogStatus.INFO, "Pagination Not Found.");
+				test.log(LogStatus.FAIL, "Failed to load Users page!!");
 			}
 			takeScreenshot();
-		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to check pagination. " + ExceptionUtils.getStackTrace(e));
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to verify user page after login. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
 	@Test(priority=3)
-	public void verifyCompanyPreviousAndNextPaginationTC() {
+	public void addUserTC() {
+		addUserPageObj = new AddUserPage(driver);
+		userListPageObj = new UsersListPage(driver);
+		username = generateRandomString(5) + "@gmail.com";
+		String pwd = "Test123$",
+			   confirmpwd = "Test123$",
+			   firstname = generateRandomString(5),
+			   lastname = generateRandomString(5),
+			   address = generateRandomString(5);
+		String msg = "This feature is available only for Consero Global, BTQ and Propeller Industries domain users";
+			   
 		try {
-			if(basePage.pagination.size()>0) {
-				test.log(LogStatus.INFO, "Pagination Found.");
-				if(basePage.previousButton.isEnabled()) {
-					basePage.clickOnPreviousPagination();
-					test.log(LogStatus.INFO, "clicked on previous button successfully.");
-				} else {
-					basePage.clickOnNextPagination();
-					test.log(LogStatus.INFO, "Previous page is already selected so, clicked on Next pagination link successfully.");
-				}
-				takeScreenshot();
-				if(basePage.nextButton.isEnabled()) {
-					basePage.clickOnNextPagination();
-					test.log(LogStatus.INFO, "clicked on Next button successfully.");
-				} else {
-					basePage.clickOnPreviousPagination();
-					test.log(LogStatus.INFO, "Next page is already selected so, clicked on Previous pagination link successfully.");
-				}
-			} else {
-				test.log(LogStatus.INFO, "Pagination Not Found.");
-			}
-			takeScreenshot();
-		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to verify previous and next pagination in company List. " + ExceptionUtils.getStackTrace(e));
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=4)
-	public void verifyCompanyFirstAndLastPaginationTC() {
-		try {
-			if(basePage.pagination.size()>0) {
-				test.log(LogStatus.INFO, "Pagination Found.");
-				if(basePage.firstButton.isEnabled()) {
-					basePage.clickOnFirstPagination();
-					test.log(LogStatus.INFO, "clicked on first pagination link successfully.");
-				} else {
-					basePage.clickOnLastPagination();
-					test.log(LogStatus.INFO, "First page is already selected so, clicked on last pagination link successfully.");
-				}
-				sleep();
-				takeScreenshot();
-				
-				if(basePage.lastButton.isEnabled()) {
-					basePage.clickOnLastPagination();
-					test.log(LogStatus.INFO, "clicked on last button successfully.");
-				} else {
-					basePage.clickOnFirstPagination();
-					test.log(LogStatus.INFO, "Last page is already selected so, clicked on first pagination link successfully.");
-				}
-				sleep();
-			} else {
-				test.log(LogStatus.INFO, "Pagination Not Found.");
-			}
-			takeScreenshot();
-		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to verify first and last pagination in company List. " + ExceptionUtils.getStackTrace(e));
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=5)
-	public void verifyCompanyEntriesTC() {
-		companyListPageObj = new CompanyListPage(driver);
-		int entries = 0;
-		String selectedEntries = "";
-		try {
-			selectedEntries = companyListPageObj.getSelectedEntries();
-			String pageCount = companyListPageObj.getLastPageCount();
-			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + pageCount);
-			companyListPageObj.selectCompanyEntries();
 			sleep();
-			selectedEntries = companyListPageObj.getSelectedEntries();
-			try {
-				entries = Integer.valueOf(selectedEntries);
-			} catch(NumberFormatException nfe) {
-				System.out.println("NumberFormatException: " + nfe.getMessage());
-			}
-			int count = companyListPageObj.getCompanyCount();
-			if(entries == count) {
-				test.log(LogStatus.PASS, "Company count is equal to selected entries.");
+			userListPageObj.clickOnCreateNewUser();
+			Thread.sleep(5000);
+			if(basePage.isElementPresent(addUserPageObj.pageTitle, 60)) {
+				test.log(LogStatus.INFO, "'create new user' page loaded successfully!!");
+//				try {
+				addUserPageObj.setUserName(username);
+				addUserPageObj.setPassword(pwd);
+				addUserPageObj.setConfirmPassword(confirmpwd);
+				addUserPageObj.setFirstName(firstname);
+				addUserPageObj.setLastName(lastname);
+				addUserPageObj.setAddressLineOne(address);
+				addUserPageObj.clickOnIsSuperUser();
+				if(addUserPageObj.isSuperUserMessageExist(msg)) {
+					test.log(LogStatus.INFO, msg);
+				} 
+				addUserPageObj.clickOnCreate();
+				/*} catch (Exception e) {
+					//addUserPageObj.clickOnBackToList();
+				}*/
+				sleep();
+				userListPageObj.setUserSearch(username);
+				if(userListPageObj.isUsereExist(username)) {
+					test.log(LogStatus.PASS, "user created successfully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to create user!!");
+				}
 			} else {
-				test.log(LogStatus.FAIL, "Company count is not equal to selected entries.");
+				test.log(LogStatus.FAIL, "Failed to load 'create new user' page!!");
 			}
 			takeScreenshot();
-			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + companyListPageObj.getLastPageCount());
 		} catch(Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to verify company Entries. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to create user. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	//@Test(priority=6)
+	@Test(priority = 4)
+	public void verifyWelcomeEmailTC() {
+		userListPageObj = new UsersListPage(driver);
+		String welcomeMessage = "Welcome Mail was send successfully to " + username,
+				tokenMessage = "Reset Password Mail was send successfully to " + username;
+		try {
+			userListPageObj.setUserSearch(username);
+			if (userListPageObj.isUsereExist(username)) {
+				userListPageObj.clickOnWelcomeUser();
+				if (basePage.checkSuccessMessage(welcomeMessage)) {
+					test.log(LogStatus.PASS, "welcome email sent successfully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to sent welcome email!!");
+				}
+				takeScreenshot();
+
+				if (userListPageObj.getWelcomeUserText().equals("Send token")) {
+					test.log(LogStatus.INFO, "'sent token' text displayed successfully after welcome email!!");
+					userListPageObj.clickOnSendToken();
+					if (basePage.checkSuccessMessage(tokenMessage)) {
+						test.log(LogStatus.PASS, "resend email sent successfully!!");
+					} else {
+						test.log(LogStatus.FAIL, "Failed to sent resend email!!");
+					}
+				}
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to activate/deactivate user. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 5)
+	public void activateDeactivateUserTC() {
+		userListPageObj = new UsersListPage(driver);
+		String deactiveContent = "Are you sure to deactivate", activeContent = "Are you sure to activate";
+		try {
+			userListPageObj.setUserSearch(username);
+			if (userListPageObj.isUsereExist(username)) {
+				userListPageObj.clickOnDeactivate();
+				if (userListPageObj.isModalExist(deactiveContent)) {
+					userListPageObj.clickOnConfirm();
+					takeScreenshot();
+				}
+				sleep();
+				userListPageObj.clickOnInactiveUser();
+				userListPageObj.setUserSearch(username);
+				if (userListPageObj.isUsereExist(username)) {
+					test.log(LogStatus.PASS, "user deactivated successfully!!");
+					takeScreenshot();
+					userListPageObj.clickOnActivate();
+					if (userListPageObj.isModalExist(activeContent)) {
+						userListPageObj.clickOnConfirm();
+						takeScreenshot();
+					}
+					userListPageObj.clickOnActiveUsers();
+					userListPageObj.setUserSearch(username);
+					if (userListPageObj.isUsereExist(username)) {
+						test.log(LogStatus.PASS, "user activated successfully!!");
+					} else {
+						test.log(LogStatus.FAIL, "Failed to activate user!!");
+					}
+					takeScreenshot();
+				} else {
+					test.log(LogStatus.FAIL, "Failed to deactivate user!!");
+				}
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to activate/deactivate user. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=6)
+	public void addBulkUserTC() {
+		homePageObj = new HomePage(driver);
+		bulkUserPageObj = new AddBulkUserPage(driver);
+		
+		String menuName = "Add Users in Bulk",
+			   fileName = "C:\\Users\\Admin\\conseroFiles\\userbulk-sample-file.csv";
+		try {
+			homePageObj.moveToUsers();
+			homePageObj.selectUserSubmennu(menuName);
+			if(basePage.isElementPresent(userListPageObj.pageTitle, 60)) {
+				test.log(LogStatus.INFO, "'Bulk Insert Users' page loaded successfully!!");
+				bulkUserPageObj.setBulkUser(fileName);
+				bulkUserPageObj.clickOnImportBulkUser();
+				if(bulkUserPageObj.isModalExist()) {
+					bulkUserPageObj.clickOnConfirmModal();
+				}
+				
+				if(bulkUserPageObj.isSuccessfullUserTableExist()) {
+					test.log(LogStatus.PASS, "bulk user added successfully!!");
+				}
+				
+				if(bulkUserPageObj.isDuplicateUserTableExist()) {
+					test.log(LogStatus.PASS, "bulk user added but few of them is already exist");
+				} else {
+					test.log(LogStatus.FAIL, "No duplicate user found while adding bulk users!!");
+				}
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to add bulk user. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=7)
+	public void deactivateBulkUserTC() {
+		deactivateBulkUserPageObj = new DeactivateBulkUserPage(driver);
+		homePageObj = new HomePage(driver);
+		
+		String menuName = "Deactivate Users in Bulk",
+			   filePath = "C:\\Users\\Admin\\conseroFiles\\deactivate-userbulk-sample-file.csv";
+		try {
+			homePageObj.moveToUsers();
+			homePageObj.selectUserSubmennu(menuName);
+			if(basePage.isElementPresent(userListPageObj.pageTitle, 60)) {
+				test.log(LogStatus.INFO, "'Bulk Insert Users' page loaded successfully!!");
+				deactivateBulkUserPageObj.setDeactivateBulkUser(filePath);
+				deactivateBulkUserPageObj.clickOnImportDeactivateUser();
+				if(deactivateBulkUserPageObj.isModalExist()) {
+					deactivateBulkUserPageObj.clickOnConfirmModal();
+				}
+				
+				if(deactivateBulkUserPageObj.isErrorTableExist()) {
+					test.log(LogStatus.FAIL, "Failed to deactivate bulk user!! " + deactivateBulkUserPageObj.getMessage());
+					
+				} else {
+					test.log(LogStatus.PASS, "deactivated bulk user successfully!!");
+				}
+				takeScreenshot();
+			}
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to deactivate bulk user. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=8)
 	public void verifyEnableAndDisableClientsTC() {
+		homePageObj = new HomePage(driver);
 		companyListPageObj = new CompanyListPage(driver);
 		try {
+			homePageObj.clickOnCompanies();
+			Thread.sleep(10000);
+			if(basePage.isElementPresent(companyListPageObj.companyListTable, 60)) {
+				test.log(LogStatus.INFO, "Company List loaded successfully. ");
+			} 
+			
+			sleep();
 			if(companyListPageObj.isActiveClientSelected()) {
 				test.log(LogStatus.INFO, "Active client option is displaying by default!!");
 			}
@@ -236,7 +373,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	//@Test(priority=7)
+	@Test(priority=9)
 	public void createCompanyTC() {
 		addCompanyPageObj = new AddCompanyPage(driver);
 		companyListPageObj = new CompanyListPage(driver);
@@ -250,6 +387,7 @@ public class ConseroAdminTestScript extends BaseTest {
 			companyListPageObj.clickOnCreateCompany();
 			addCompanyPageObj.setCompanyDetails(companyName, address1, city, state, zipcode, adminUser, adminPassword );
 			basePage.waitElementVisible(companyListPageObj.companyListTable, 60);
+			sleep();
 			companyListPageObj.setCompanySearch(companyName);
 			if(companyListPageObj.isCompanyExist(companyName)) {
 				test.log(LogStatus.PASS, "Company created successfully!!");
@@ -263,7 +401,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=8)
+    @Test(priority = 10)
 	public void editCompanyTC() {
 		addCompanyPageObj = new AddCompanyPage(driver);
 		companyListPageObj = new CompanyListPage(driver);
@@ -272,66 +410,72 @@ public class ConseroAdminTestScript extends BaseTest {
 		try {
 			companyListPageObj.setCompanySearch(companyName);
 			sleep();
-			companyListPageObj.clickOnEditCompany();
-			addCompanyPageObj.setUpdateCompanyDetails(address1, address2);
-			basePage.waitElementVisible(companyListPageObj.companyListTable, 60);
-			companyListPageObj.setCompanySearch(companyName);
-			sleep();
-			Assert.assertTrue(companyListPageObj.isCompanyExist(companyName));
-			if(companyListPageObj.isAddressUpdated(address1, address2)) {
-				test.log(LogStatus.PASS, "Company updated successfully!!");
-			} else {
-				test.log(LogStatus.FAIL, "Failed to update company!!");
+			if (companyListPageObj.isCompanyExist(companyName)) {
+				companyListPageObj.clickOnEditCompany();
+				addCompanyPageObj.setUpdateCompanyDetails(address1, address2);
+				basePage.waitElementVisible(companyListPageObj.companyListTable, 60);
+				companyListPageObj.setCompanySearch(companyName);
+				sleep();
+				Assert.assertTrue(companyListPageObj.isCompanyExist(companyName));
+				if (companyListPageObj.isAddressUpdated(address1, address2)) {
+					test.log(LogStatus.PASS, "Company updated successfully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to update company!!");
+				}
 			}
 			takeScreenshot();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to edit Company. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	@Test(priority=9)
+	@Test(priority = 11)
 	public void verifyCompanyDetails() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		companyListPageObj = new CompanyListPage(driver);
 		try {
-			companyListPageObj.clickOnDetails();
-			if(basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 40)) {
-				test.log(LogStatus.PASS, "Company details page opened successfully!!");
-				if(companyDetailsPageObj.isEditAndBackToListExist()) {
-					test.log(LogStatus.INFO, "Edit and Back to list button is visible!!");
+			companyListPageObj.setCompanySearch(companyName);
+			sleep();
+			if (companyListPageObj.isCompanyExist(companyName)) {
+				companyListPageObj.clickOnDetails();
+				if (basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 40)) {
+					test.log(LogStatus.PASS, "Company details page opened successfully!!");
+					if (companyDetailsPageObj.isEditAndBackToListExist()) {
+						test.log(LogStatus.INFO, "Edit and Back to list button is visible!!");
+					} else {
+						test.log(LogStatus.INFO, "Edit and Back to list button is not visible!!");
+					}
+					takeScreenshot();
+					if (companyDetailsPageObj.isTeamMemberTemplateButtonExist()) {
+						test.log(LogStatus.INFO, "Add menmber and view Email logs button is visible!!");
+					} else {
+						test.log(LogStatus.INFO, "Add menmber and view Email logs button is not visible!!");
+					}
+					takeScreenshot();
+					if (basePage.isElementPresent(companyDetailsPageObj.addLink, 40)) {
+						test.log(LogStatus.INFO, "Add Link button is visible!!");
+					} else {
+						test.log(LogStatus.INFO, "Add Link button is not visible!!");
+					}
+					takeScreenshot();
+					if (companyDetailsPageObj.isActivityTemplateButtonExist()) {
+						test.log(LogStatus.INFO, "Add close template and kickoffs button is visible!!");
+					} else {
+						test.log(LogStatus.INFO, "Add close template and kickoffs button is not visible!!");
+					}
+					takeScreenshot();
 				} else {
-					test.log(LogStatus.INFO, "Edit and Back to list button is not visible!!");
+					test.log(LogStatus.FAIL, "Failed to open company details page!!");
 				}
-				takeScreenshot();
-				if(companyDetailsPageObj.isTeamMemberTemplateButtonExist()) {
-					test.log(LogStatus.INFO, "Add menmber and view Email logs button is visible!!");
-				} else {
-					test.log(LogStatus.INFO, "Add menmber and view Email logs button is not visible!!");
-				}
-				takeScreenshot();
-				if(basePage.isElementPresent(companyDetailsPageObj.addLink, 40)) {
-					test.log(LogStatus.INFO, "Add Link button is visible!!");
-				} else {
-					test.log(LogStatus.INFO, "Add Link button is not visible!!");
-				}
-				takeScreenshot();
-				if(companyDetailsPageObj.isActivityTemplateButtonExist()) {
-					test.log(LogStatus.INFO, "Add close template and kickoffs button is visible!!");
-				} else {
-					test.log(LogStatus.INFO, "Add close template and kickoffs button is not visible!!");
-				}
-				takeScreenshot();
-			} else {
-				test.log(LogStatus.FAIL, "Failed to open company details page!!");
 			}
 			takeScreenshot();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Test(priority=10)
+	@Test(priority=12)
 	public void verifyButtonOnTeamMemberPageTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addTeamMemberPageObj = new AddTeamMemberPage(driver);
@@ -363,6 +507,8 @@ public class ConseroAdminTestScript extends BaseTest {
 				Assert.assertTrue(companyListPageObj.isCompanyExist(companyName));
 				companyListPageObj.clickOnDetails();
 				Thread.sleep(6000);
+				companyDetailsPageObj.clickOnAddTeamMember();
+				sleep();
 				addTeamMemberPageObj.clickOnCompanyDetails();
 				if(basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 60)) {
 					test.log(LogStatus.PASS, "Redirected to Company details page successfully!!");
@@ -379,17 +525,18 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=11)
+	@Test(priority=13)
 	public void addTeamMemberTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addTeamMemberPageObj = new AddTeamMemberPage(driver);
 		String role = "Consero - Manager",
 				   emailId = "neha@thinkbridge.in",
-				   title = "Senior Manager";
+				   title = "Senior Manager",
+				   content = "Are you sure, you want to add client user ?";
 		try {
 			companyDetailsPageObj.clickOnAddTeamMember();
 			if(basePage.isElementPresent(addTeamMemberPageObj.addTeamMember, 60)) {
-				addTeamMemberPageObj.setTeamMemberDetails(emailId, role, title);
+				addTeamMemberPageObj.setTeamMemberDetails(emailId, role, title, content);
 				companyDetailsPageObj.clickOnshowTeamMembers();
 				if(companyDetailsPageObj.isTeamMemberExist(emailId)) {
 					test.log(LogStatus.PASS, "Team member added successfully!!");
@@ -406,20 +553,23 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=12)
+	@Test(priority=14)
 	public void removeTeamMemberTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		String emailId = "neha@thinkbridge.in";
 		try {
 			companyDetailsPageObj.clickOnshowTeamMembers();
 			if(basePage.isElementPresent(companyDetailsPageObj.teamMemberTable, 60)) {
-				companyDetailsPageObj.clickOnRemoveTeamMember(emailId);
-				companyDetailsPageObj.clickOnshowTeamMembers();
-				if(!companyDetailsPageObj.isTeamMemberExist(emailId)) {
-					test.log(LogStatus.PASS, "Team member removed successfully!!");
-				} else {
-					test.log(LogStatus.FAIL, "Failed to remove team member!!");
-				}
+				if(companyDetailsPageObj.isTeamMemberExist(emailId)) {
+					test.log(LogStatus.PASS, "Team member added successfully!!");
+					companyDetailsPageObj.clickOnRemoveTeamMember(emailId);
+					companyDetailsPageObj.clickOnshowTeamMembers();
+					if(!companyDetailsPageObj.isTeamMemberExist(emailId)) {
+						test.log(LogStatus.PASS, "Team member removed successfully!!");
+					} else {
+						test.log(LogStatus.FAIL, "Failed to remove team member!!");
+					}
+				} 
 			} else {
 				test.log(LogStatus.FAIL, "Team member table is not present!!");
 			}
@@ -430,7 +580,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=13)
+	@Test(priority=15)
 	public void viewEmailLogsTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		viewEmailLogsPageObj = new ViewEmailLogsPage(driver);
@@ -462,6 +612,11 @@ public class ConseroAdminTestScript extends BaseTest {
 					test.log(LogStatus.INFO, "Pagination Not Found.");
 				}
 				takeScreenshot();
+				
+				viewEmailLogsPageObj.clickOnCompanyDetails();
+				if(basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 60)) {
+					test.log(LogStatus.INFO, "successfully Redirected to companyDeatils page.");
+				}
 			} else {
 				test.log(LogStatus.FAIL, "Failed to open Email notification member page!!");
 			}
@@ -472,7 +627,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=14)
+	@Test(priority=16)
 	public void addLinkTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addLinkPageObj = new AddLinkPage(driver);
@@ -519,47 +674,371 @@ public class ConseroAdminTestScript extends BaseTest {
 					} else {
 						test.log(LogStatus.FAIL, "Failed to add custom link!! linkTable is Empty!!!!!!!");
 					}
+					takeScreenshot();
 					companyDetailsPageObj.clickOnAddLink();
+				}
+				
+				viewEmailLogsPageObj.clickOnCompanyDetails();
+				if(basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 60)) {
+					test.log(LogStatus.INFO, "successfully Redirected to companyDeatils page.");
 				}
 			} else {
 				test.log(LogStatus.FAIL, "Failed to open add link page!!");
 			}
+			takeScreenshot();
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to add link. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	//@Test(priority=15)
+	@Test(priority=17)
 	public void editLinkTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addLinkPageObj = new AddLinkPage(driver);
+		String name = generateRandomString(5),
+			   link = generateRandomString(5);
 		try {
-			companyDetailsPageObj.clickOnAddLink();
-			if(basePage.isElementPresent(addLinkPageObj.pageHeader, 60)) {
-				test.log(LogStatus.PASS, "Add link page opened successfully!!");
+			companyDetailsPageObj.clickOnEditLink();
+			companyDetailsPageObj.setEditLinkDetails(name, link);
+			if(companyDetailsPageObj.isLinkUpdated(name, link)) {
+				test.log(LogStatus.PASS, "Link updated successfully.");
 			} else {
-				test.log(LogStatus.FAIL, "Failed to open add link page!!");
+				test.log(LogStatus.FAIL, "Failed to update link.");
 			}
+			takeScreenshot();
 		} catch(Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to add link. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to edit link. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	//@Test(priority=16)
+	@Test(priority=18)
 	public void deleteLinkTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addLinkPageObj = new AddLinkPage(driver);
 		try {
-			companyDetailsPageObj.clickOnAddLink();
-			if(basePage.isElementPresent(addLinkPageObj.pageHeader, 60)) {
-				test.log(LogStatus.PASS, "Add link page opened successfully!!");
+			String linkName = companyDetailsPageObj.getUpdatedLinkName();
+			companyDetailsPageObj.clickOnDeleteLink();
+			
+			if(companyDetailsPageObj.isLinkDeleted(linkName)) {
+				test.log(LogStatus.PASS, "link deleted successfully!!");
 			} else {
-				test.log(LogStatus.FAIL, "Failed to open add link page!!");
+				test.log(LogStatus.FAIL, "Failed to delete link!!");
 			}
+			takeScreenshot();
 		} catch(Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to add link. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to delete link. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=19)
+	public void addCloseTemplateTC() {
+		companyDetailsPageObj = new CompanyDetailsPage(driver);
+		addCloseTemplatePageObj = new AddCloseTemplatePage(driver);
+		String templateName = generateRandomString(5),
+			   templateText = prop.getProperty("templateText");
+		System.out.println(templateText);
+		try {
+			companyDetailsPageObj.clickOnAddCloseTemplate();
+			if(basePage.isElementPresent(addCloseTemplatePageObj.pageTitle, 60)) {
+				test.log(LogStatus.PASS, "'Add close template' page opened successfully!!");
+				
+				if(!addCloseTemplatePageObj.isCompanyNameEnabled()) {
+					test.log(LogStatus.PASS, "'company Name' is disabled!!");
+				} else {
+					test.log(LogStatus.FAIL, "'company Name' is enabled!! It should be disabled!!!");
+				}
+				takeScreenshot();
+				
+				if(addCloseTemplatePageObj.checkCloseTemplateButton()) {
+					test.log(LogStatus.PASS, "'Add', 'companies' and 'Company Details' button present on page!!");
+				}
+				sleep();
+				addCloseTemplatePageObj.setCloseTemplateDetails(templateName, templateText);
+				if(companyDetailsPageObj.isTemplateAdded(templateName)) {
+					test.log(LogStatus.PASS, "Close Template added sucessfully!!");
+				} else {
+					test.log(LogStatus.PASS, "Failed to add close template!!");
+				}
+			} else {
+				test.log(LogStatus.FAIL, "Failed to open 'Add close template' page!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete link. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=20)
+	public void validateCloseTemplateTC() {
+		companyDetailsPageObj = new CompanyDetailsPage(driver);
+		templateDetailsPageObj = new TemplateDetailsPage(driver);
+		
+		String successMessage = "Template Validated Succesfully. You can Kick off activites now!";
+		try {
+			companyDetailsPageObj.clickOnValidate();
+			if(basePage.isElementPresent(templateDetailsPageObj.pageTitle, 60)) {
+				test.log(LogStatus.PASS, "'Template Details' page opened successfully!!");
+				if(templateDetailsPageObj.isWarningExist()) {
+					test.log(LogStatus.INFO, "template not validated sucessfully " + templateDetailsPageObj.getWarning());
+				} 
+				
+				if(templateDetailsPageObj.isTemplateValidated(successMessage)) {
+					test.log(LogStatus.PASS, "Template validated successfully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to validated Template!!");
+				}
+				
+				if(templateDetailsPageObj.isFieldDisabled()) {
+					test.log(LogStatus.INFO, "All fields are disabled!!!!");
+				}
+				
+				if(templateDetailsPageObj.checkTemplateDetailsButton()) {
+					test.log(LogStatus.INFO, "All buttons are present!!!!");
+				}
+				takeScreenshot();
+				
+				templateDetailsPageObj.clickOnCompanyDetails();
+				if(basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 60)) {
+					test.log(LogStatus.INFO, "successfully Redirected to companyDeatils page.");
+				}
+			} else {
+				test.log(LogStatus.FAIL, "Failed to open 'Template Details' page!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete link. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	//@Test(priority=21)
+	public void templateDetailsTC() {
+		try {
+			
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete link. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=22)
+	public void kickOffSetupTC() {
+		companyDetailsPageObj = new CompanyDetailsPage(driver);
+		kickOffClosePageObj = new KickOffClosePage(driver);
+		controlDockPageObj = new ControlDockPage(driver);
+		
+		String message = "Kicked off template successfully.";
+		
+		try {
+			companyDetailsPageObj.clickOnKickoffSetup();
+			if(basePage.isElementPresent(kickOffClosePageObj.pageTitle, 60)) {
+				test.log(LogStatus.PASS, "'Kickoff Close' page opened successfully!!");
+				if(!kickOffClosePageObj.isCompanyEnabled() && !kickOffClosePageObj.isTemplateEnabled()) {
+					test.log(LogStatus.INFO, "'Company Name' and 'Template Name' fields are disabled!!!!");
+				}
+				
+				if(kickOffClosePageObj.checkKickOffCloseButton()) {
+					test.log(LogStatus.INFO, "All buttons are present!!!!");
+				}
+				takeScreenshot();
+				sleep();
+				kickOffClosePageObj.clickOnKickOff();
+				if(basePage.checkSuccessMessage(message)) {
+					test.log(LogStatus.INFO, "get success message!!!!");
+				}
+				
+				if(basePage.isElementPresent(controlDockPageObj.pageTitle, 60)) {
+					test.log(LogStatus.PASS, "Redirected On Control Dock Page successfully!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to redirect On Control Dock Page!!!!");
+				}
+				sleep();
+			} else {
+				test.log(LogStatus.FAIL, "Failed to open 'Kickoff Close' page!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete link. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=23)
+	public void kickOffsTC() {
+		homePageObj = new HomePage(driver);
+		companyListPageObj = new CompanyListPage(driver);
+		companyDetailsPageObj = new CompanyDetailsPage(driver);
+		kickOffPageObj = new KickOffsPage(driver);
+		
+		String title = "Kickoffs For " + companyName;
+		try {
+			sleep();
+			homePageObj.clickOnCompanies();
+			Thread.sleep(10000);
+			if(basePage.isElementPresent(companyListPageObj.companyListTable, 60)) {
+				test.log(LogStatus.INFO, "Company List loaded successfully. ");
+			} 
+			companyListPageObj.setCompanySearch(companyName);
+			sleep();
+			if (companyListPageObj.isCompanyExist(companyName)) {
+				companyListPageObj.clickOnDetails();
+				if (basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 40)) {
+					test.log(LogStatus.PASS, "Company details page opened successfully!!");
+					companyDetailsPageObj.clickOnKickOffs();
+					if(kickOffPageObj.isPageTitleExist(title)) {
+						test.log(LogStatus.PASS, "'kickoffs' page opened successfully!!");
+						if(kickOffPageObj.checkKickOffsButton()) {
+							test.log(LogStatus.INFO, "All buttons are present!!!!");
+						}
+					}
+				}
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete link. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 24)
+	public void closeKickOffTC() {
+		kickOffPageObj = new KickOffsPage(driver);
+		String title = "Kickoffs For " + companyName,
+			   status ="Closed";
+		try {
+			if(kickOffPageObj.isPageTitleExist(title)) {
+				test.log(LogStatus.PASS, "'kickoffs' page opened successfully!!");
+				kickOffPageObj.clickOnClose();
+				driver.switchTo().alert().accept();
+				sleep();
+				if(kickOffPageObj.getStatus().equals(status)) {
+					test.log(LogStatus.PASS, "kickoff closed successfully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to close kickoff!!");
+				}
+				takeScreenshot();
+				
+				Assert.assertTrue(kickOffPageObj.isReopenButtonExist());
+				test.log(LogStatus.INFO, "'Reopen' button present after close the kickoff!!");
+				kickOffPageObj.clickOnReopen();
+				sleep();
+				if(kickOffPageObj.getStatus().equals("Open")) {
+					test.log(LogStatus.PASS, "kickoff reopened successfully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to reopened kickoff!!");
+				}
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to close and reopen kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 25)
+	public void bizDaysTC() {
+		kickOffPageObj = new KickOffsPage(driver);
+		controlDockPageObj = new ControlDockPage(driver);
+		try {
+			kickOffPageObj.clickOnBizdays();
+			if(basePage.isElementPresent(kickOffPageObj.BizDaysTitle, 60)) {
+				test.log(LogStatus.PASS, "'Biz Days' page opened successfully!!");
+				kickOffPageObj.setNumberOfDaysToMove("1");
+				if(kickOffPageObj.checkBizDaysButton()) {
+					test.log(LogStatus.INFO, "All buttons are present!!!!");
+				}
+				
+				kickOffPageObj.clickOnCheckDates();
+				if(basePage.isElementPresent(kickOffPageObj.warning, 30)) {
+					test.log(LogStatus.INFO, "check date warning exist!!!! " + kickOffPageObj.getWarning() );
+				}
+				kickOffPageObj.clickOnMoveDates();
+				
+				if(basePage.isElementPresent(controlDockPageObj.pageTitle, 60)) {
+					test.log(LogStatus.PASS, "Redirected On Control Dock Page successfully!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to redirect On Control Dock Page!!!!");
+				}
+				sleep();
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	//@Test(priority = 26)
+	public void deleteTC() {
+		kickOffPageObj = new KickOffsPage(driver);
+		try {
+			kickOffPageObj.clickOnDelete();
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 27)
+	public void manageEmailAutomationTC() {
+		homePageObj = new HomePage(driver);
+		companyListPageObj = new CompanyListPage(driver);
+		companyDetailsPageObj = new CompanyDetailsPage(driver);
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		emailTemplateName = generateRandomString(5);
+		try {
+			sleep();
+			homePageObj.clickOnCompanies();
+			Thread.sleep(10000);
+			if(basePage.isElementPresent(companyListPageObj.companyListTable, 60)) {
+				test.log(LogStatus.INFO, "Company List loaded successfully. ");
+			} 
+			companyListPageObj.setCompanySearch(companyName);
+			sleep();
+			if (companyListPageObj.isCompanyExist(companyName)) {
+				companyListPageObj.clickOnDetails();
+				if (basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 40)) {
+					test.log(LogStatus.PASS, "Company details page opened successfully!!");
+					companyDetailsPageObj.clickOnManageEmailAutomation();
+					if (basePage.isElementPresent(manageEmailPageObj.pageTitle, 60)) {
+						test.log(LogStatus.PASS, "'Manage Email Automation' page opened successfully!!");
+						manageEmailPageObj.clickOnAddNewEmailTemplate();
+						Assert.assertTrue(manageEmailPageObj.isModalExist());
+						manageEmailPageObj.setNewBillsEmailTemplateName(emailTemplateName);
+						manageEmailPageObj.clickOnSave();
+						sleep();
+						if (manageEmailPageObj.isNewEmailTemplateAdded(emailTemplateName)) {
+							test.log(LogStatus.PASS, "New Template added successfully!!!!");
+						} else {
+							test.log(LogStatus.FAIL, "Failed to add new template!!!!");
+						}
+					}
+				}
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+		
+	//@Test(priority = 28)
+	public void emailReminderLevelTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		
+		try {
+			manageEmailPageObj.clickOnEmailReminderLevel();
+			manageEmailPageObj.setReminderLevelToForBills("1");
+			manageEmailPageObj.selectTemplate(emailTemplateName);
+			manageEmailPageObj.clickOnAddReminderLevel();
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}

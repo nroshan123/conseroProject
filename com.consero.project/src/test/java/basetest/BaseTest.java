@@ -83,7 +83,7 @@ public class BaseTest {
 	}
 
 	public void navigate(String appUrl) {
-		driver.get(appUrl);
+		driver.get("https://consero-prod-beta.azurewebsites.net/");
 	}
 	
 	/*

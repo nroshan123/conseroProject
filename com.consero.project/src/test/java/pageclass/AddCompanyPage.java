@@ -83,6 +83,14 @@ public class AddCompanyPage extends BasePage {
 		addressLineOne.sendKeys(address1);
 	}
 	
+	public String getAddressLineOne() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",addressLineOne).toString();
+	}
+	
+	public String getAddressLineTwo() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",addressLineTwo).toString();
+	}
+	
 	public void setAddressLineTwo(String address2) {
 		addressLineTwo.sendKeys(address2);
 	}
@@ -109,6 +117,10 @@ public class AddCompanyPage extends BasePage {
 	
 	public void clickOnCompanyLogo() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", companyLogo);
+	}
+	
+	public void setCompanyLogo(String filePath) {
+		companyLogo.sendKeys(filePath);
 	}
 	
 	public void clickOnmonthEndSummary() {
@@ -146,9 +158,10 @@ public class AddCompanyPage extends BasePage {
 				this.setcustomerEmail(email);
 				this.setcustomerPassword(password);
 				Thread.sleep(1000);
-				this.clickOnCompanyLogo();
+				this.setCompanyLogo("C:\\Users\\Admin\\conseroFiles\\companyLogo.png");
+				/*this.clickOnCompanyLogo();
 				Thread.sleep(2000);
-				Runtime.getRuntime().exec("C:\\Users\\thinkBridge\\Desktop\\AutoIT\\companyLogo.exe");
+				Runtime.getRuntime().exec("C:\\Users\\thinkBridge\\Desktop\\AutoIT\\companyLogo.exe");*/
 				this.clickOnmonthEndSummary();
 				this.clickOnRealTimeDashboard();
 				this.clickOnCreateCompany();
@@ -161,7 +174,13 @@ public class AddCompanyPage extends BasePage {
 	public void setUpdateCompanyDetails(String address1, String address2) {
 		try {
 			if(isElementPresent(editCompanyForm, 60)) {
+				if(!Strings.isNullOrEmpty(this.getAddressLineOne())) {
+					addressLineOne.clear();
+				}
 				this.setAddressLineOne(address1);
+				if(!Strings.isNullOrEmpty(this.getAddressLineTwo())) {
+					addressLineTwo.clear();
+				}
 				this.setAddressLineTwo(address2);
 				this.clickOnUpdateCompany();
 			}

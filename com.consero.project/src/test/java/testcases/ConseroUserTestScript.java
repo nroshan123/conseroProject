@@ -32,7 +32,7 @@ public class ConseroUserTestScript extends BaseTest {
 	AddUserPage addUserPageObj = null;
 	
 	String sheetName = "credentials";
-	String adminUser = "", adminPassword = "";
+	String adminUser = "prasanna@thinkbridge.in", adminPassword = "Consero123$";
 	String companyName= "automation_test_company_DAn", username ="";
 	
 	@BeforeMethod(alwaysRun = true)
@@ -50,13 +50,14 @@ public class ConseroUserTestScript extends BaseTest {
 	@Test
 	public void loginTC(String appUrl) {
 		try {
-			List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
+			System.out.println(appUrl);
+			/*List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
 			for (int i = 0; i < TCData.size(); i++) {
 				if(TCData.get(i).get("role").equals("admin")) {
 					adminUser = TCData.get(i).get("email");
 					adminPassword = TCData.get(i).get("password");
 				}
-			}
+			}*/
 			loadConfig();
 			test.log(LogStatus.INFO, "Loading config file");
 			navigate(appUrl);

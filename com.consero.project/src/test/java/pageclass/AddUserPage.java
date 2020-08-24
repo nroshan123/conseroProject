@@ -1,9 +1,11 @@
 package pageclass;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.testng.util.Strings;
 
 public class AddUserPage extends BasePage{
 
@@ -48,11 +50,25 @@ public class AddUserPage extends BasePage{
 		PageFactory.initElements(driver, this);
 	}
 	
+	public String getUserName() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",userName).toString();
+	}
+	
+	public String getPassword() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",password).toString();
+	}
+	
 	public void setUserName(String name) {
+		if(!Strings.isNullOrEmpty(this.getUserName())) {
+			userName.clear();
+		}
 		userName.sendKeys(name);
 	}
 	
 	public void setPassword(String pwd) {
+		if(!Strings.isNullOrEmpty(this.getPassword())) {
+			password.clear();
+		}
 		password.sendKeys(pwd);
 	}
 	
@@ -75,11 +91,15 @@ public class AddUserPage extends BasePage{
 	}
 	
 	public void clickOnIsSuperUser() {
-		isSuperUser.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", isSuperUser);
 	}
 	
 	public void clickOnCreate() {
-		create.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", create);
+	}
+	
+	public void clickOnBackToList() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", backToList);
 	}
 	
 	public boolean isSuperUserMessageExist(String msg) {

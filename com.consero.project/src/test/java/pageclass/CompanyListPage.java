@@ -15,34 +15,34 @@ public class CompanyListPage extends BasePage{
 	
 	WebDriver driver;
 
-	@FindBy(id = "companiesTable")
+	@FindBy(id = "companyListViewGrid")
 	public WebElement companyListTable;
 	
 	@FindBy(xpath = "//a[text()='Create A New Company']")
 	WebElement createCompany;
 	
-	@FindBy(xpath = "//div[@id='companiesTable_filter']//input[@type='search']")
+	@FindBy(id = "companyListSearch")
 	WebElement companySearch;
 	
 	@FindBy(xpath = "//table[@id='companiesTable']//tbody//tr")
 	List<WebElement> companiesInList;
 	
-	@FindBy(xpath = "//table[@id='companiesTable']//tbody//tr//td[2]")
+	@FindBy(xpath = "//div[@id='companyListViewGrid']//div[@ref='eBodyViewport']//div[@col-id='Name']")
 	List<WebElement> companyNameInList;
 	
-	@FindBy(xpath = "//table[@id='companiesTable']//tr[1]//td[3]")
+	@FindBy(xpath = "//div[@id='companyListViewGrid']//div[@ref='eBodyViewport']//div[@col-id='AddressLineOne']")
 	WebElement addressOneInList;
 	
-	@FindBy(xpath = "//table[@id='companiesTable']//tr[1]//td[4]")
+	@FindBy(xpath = "//div[@id='companyListViewGrid']//div[@ref='eBodyViewport']//div[@col-id='AddressLineTwo']")
 	WebElement addressTwoInList;
 	
-	@FindBy(xpath = "//table[@id='companiesTable']//tr[1]//a[text()='Edit']")
+	@FindBy(xpath = "//div[@id='companyListViewGrid']//div[@ref='eBodyViewport']//div[@col-id='Action']//a[text()='Edit']")
 	WebElement edit;
 	
-	@FindBy(xpath = "//table[@id='companiesTable']//tr[1]//a[text()='Details']")
+	@FindBy(xpath = "//div[@id='companyListViewGrid']//div[@ref='eBodyViewport']//div[@col-id='Action']//a[contains(text(),'Details')]")
 	WebElement details;
 	
-	@FindBy(xpath = "//table[@id='companiesTable']//a[text()='Deactivate']")
+	@FindBy(xpath = "//div[@id='companyListViewGrid']//div[@ref='eBodyViewport']//div[@col-id='IsInactive']//a[text()='Deactivate']")
 	WebElement deactivate;
 	
 	@FindBy(id = "btnActiveEntities")
@@ -90,7 +90,7 @@ public class CompanyListPage extends BasePage{
 	}
 	
 	public void clickOnCreateCompany() {
-		createCompany.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", createCompany);
 	}
 	
 	public boolean isCompanyExist(String name) {

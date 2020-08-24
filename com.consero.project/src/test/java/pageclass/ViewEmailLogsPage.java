@@ -18,14 +18,23 @@ public class ViewEmailLogsPage extends BasePage {
 	@FindBy(xpath = "//table[@id='EmailNotificationLogsTable']//tbody//tr//td[@class='dataTables_empty']")
 	public WebElement emptyTable;
 	
+	@FindBy(xpath = "//a[text()='Companies']")
+	public WebElement companies;
+	
+	@FindBy(xpath = "//a[text()='Company Details']")
+	public WebElement companyDetails;
+	
 	@FindBy(name = "EmailNotificationLogsTable_length")
 	public WebElement entries;
 	
-	 public ViewEmailLogsPage(WebDriver driver){
-			super(driver);
-			this.driver = driver;
-			PageFactory.initElements(driver, this);
-			
-		}
+	public ViewEmailLogsPage(WebDriver driver) {
+		super(driver);
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	}
+	 
+	 public void clickOnCompanyDetails() {
+		 companyDetails.click();
+	 }
 	 
 }

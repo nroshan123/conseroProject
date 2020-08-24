@@ -2,10 +2,12 @@ package pageclass;
 
 import java.util.List;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.testng.util.Strings;
 
 public class UsersListPage extends BasePage {
 	
@@ -31,6 +33,9 @@ public class UsersListPage extends BasePage {
 	
 	@FindBy(xpath = "//a[text()='Create A New User']")
 	WebElement createNewUser;
+	
+	@FindBy(xpath = "//div[@id='userTableGrid']//span[text()='No matching records found']")
+	WebElement emptyUserTable;
 	
 	@FindBy(xpath = "//div[@id='userTableGrid']//div[@ref='eBodyViewport']//div[@col-id='UserName']/span/a")
 	List<WebElement> usernameinTable;
@@ -63,7 +68,14 @@ public class UsersListPage extends BasePage {
 		PageFactory.initElements(driver, this);
 	}
 	
+	public String getUserSearchText() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",userSearch).toString();
+	}
+	
 	public void setUserSearch(String value) {
+		if(!Strings.isNullOrEmpty(this.getUserSearchText())) {
+			userSearch.clear();
+		}
 		userSearch.sendKeys(value);
 	}
 	
@@ -94,20 +106,24 @@ public class UsersListPage extends BasePage {
 	}
 	
 	public boolean isUsereExist(String name) {
-		for(WebElement username:usernameinTable) {
-			if(username.getText().equals(name)) {
-				return true;
+		if(isElementPresent(emptyUserTable,60)) {
+			return false;
+		} else {
+			for(WebElement username:usernameinTable) {
+				if(username.getText().equalsIgnoreCase(name)) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 	
 	public void clickOnWelcomeUser() {
-		welcomeUser.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", welcomeUser);
 	}
 	
 	public void clickOnSendToken() {
-		sendToken.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", sendToken);
 	}
 	
 	public String getWelcomeUserText() {
@@ -115,11 +131,11 @@ public class UsersListPage extends BasePage {
 	}
 	
 	public void clickOnDeactivate() {
-		deactivate.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", deactivate);
 	}
 	
 	public void clickOnActivate() {
-		activate.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", activate);
 	}
 	
 	public boolean isModalExist(String content ) {
