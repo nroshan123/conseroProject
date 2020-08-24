@@ -973,7 +973,7 @@ public class ConseroAdminTestScript extends BaseTest {
 	}
 	
 	//@Test(priority = 26)
-	public void deleteTC() {
+	public void deleteKickOffTC() {
 		kickOffPageObj = new KickOffsPage(driver);
 		try {
 			kickOffPageObj.clickOnDelete();
@@ -1027,15 +1027,76 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 		
-	//@Test(priority = 28)
+	@Test(priority = 28)
 	public void emailReminderLevelTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
-		
+		String from = "2",
+			   successMessage = "Email Reminder Level Configured successfully";
 		try {
 			manageEmailPageObj.clickOnEmailReminderLevel();
-			manageEmailPageObj.setReminderLevelToForBills("1");
-			manageEmailPageObj.selectTemplate(emailTemplateName);
-			manageEmailPageObj.clickOnAddReminderLevel();
+			manageEmailPageObj.setReminderLevelDetails(from, emailTemplateName);
+			if(basePage.checkSuccessMessage(successMessage)) {
+				test.log(LogStatus.PASS, "reminder level added successfully!!!!");
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	// @Test(priority = 29)
+	public void deleteEmailReminderLevelTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		try {
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+
+	// @Test(priority = 30)
+	public void emailFrequencyTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		String days= "2";
+		String successMessage = "Email Frequency Configured Successfully";
+		try {
+			manageEmailPageObj.clickOnEmailFrequency();
+			manageEmailPageObj.clickOnWeekDays();
+			manageEmailPageObj.setWeekDaysDetails(days);
+			if(basePage.checkSuccessMessage(successMessage)) {
+				test.log(LogStatus.PASS, "email frequency added successfully for week days!!!!");
+			}
+			takeScreenshot();
+			manageEmailPageObj.clickOnBizDays();
+			manageEmailPageObj.setBizDaysDetails(days);
+			if(basePage.checkSuccessMessage(successMessage)) {
+				test.log(LogStatus.PASS, "email frequency added successfully for biz days!!!!");
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+
+	// @Test(priority = 31)
+	public void emailAuditLogTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		try {
+			manageEmailPageObj.clickOnEmailAutomationAuditLog();
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+		
+	// @Test(priority = 32)
+	public void manageDepartmentExpenseTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		try {
 			takeScreenshot();
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
