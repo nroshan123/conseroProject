@@ -230,6 +230,12 @@ public class BaseTest {
 		return df.format(dateobj);
 	}
 	
+	public String getCurrentDateInFormat() {
+		DateFormat df = new SimpleDateFormat("M/dd/yyyy");
+		Date dateobj = new Date();
+		return df.format(dateobj);
+	}
+	
 	public String getdayFromDateFormat(String date) {
 		String dateParts[] = date.split("/");
 		return dateParts[1];

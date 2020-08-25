@@ -13,4 +13,10 @@
 		</classes>
 	</test>
 	
+	<test name="Test">
+		<classes>
+			<class name="testcases.ConseroManagerTestScript" />
+		</classes>
+	</test>
+	
 </suite>

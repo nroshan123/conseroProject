@@ -8,7 +8,10 @@ import org.openqa.selenium.support.PageFactory;
 public class LoginPage extends BasePage {
 
 	WebDriver driver;
-
+	
+	@FindBy(xpath = "//div[@class='login-box-content']")
+	public WebElement loginDiv;
+	
 	@FindBy(id = "username")
 	WebElement username;
 	

@@ -29,6 +29,7 @@ import pageclass.HomePage;
 import pageclass.KickOffClosePage;
 import pageclass.KickOffsPage;
 import pageclass.LoginPage;
+import pageclass.ManageDepartmentExpensePage;
 import pageclass.ManageEmailAutomationPage;
 import pageclass.TemplateDetailsPage;
 import pageclass.UsersListPage;
@@ -59,6 +60,7 @@ public class ConseroAdminTestScript extends BaseTest {
 	ControlDockPage controlDockPageObj = null;
 	KickOffsPage kickOffPageObj = null; 
 	ManageEmailAutomationPage manageEmailPageObj = null;
+	ManageDepartmentExpensePage manageDepartmentExpensePageObj = null;
 	
 	String sheetName = "credentials";
 	String adminUser = "prasanna@thinkbridge.in", adminPassword = "Consero123$";
@@ -967,7 +969,7 @@ public class ConseroAdminTestScript extends BaseTest {
 			}
 			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to verify Biz days. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
@@ -1022,7 +1024,7 @@ public class ConseroAdminTestScript extends BaseTest {
 			}
 			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to verify manage email automation. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
@@ -1051,12 +1053,12 @@ public class ConseroAdminTestScript extends BaseTest {
 		try {
 			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to verify email reminder. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 
-	// @Test(priority = 30)
+	@Test(priority = 30)
 	public void emailFrequencyTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
 		String days= "2";
@@ -1076,30 +1078,194 @@ public class ConseroAdminTestScript extends BaseTest {
 			}
 			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to verify email frequency. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 
-	// @Test(priority = 31)
+	@Test(priority = 31)
 	public void emailAuditLogTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		String date = getCurrentDate(),
+				typeLevel = manageEmailPageObj.getTypeLevel(),
+				billPendingLevel = manageEmailPageObj.getBillsPendingLevel(),
+				bizDaysLevel = manageEmailPageObj.getBillsBizDayLevel(),
+				typeValue = manageEmailPageObj.getCheckedFrequency(),
+				billPendingInQueue = manageEmailPageObj.getbizdaysCutOffDays(),
+				bizDays = manageEmailPageObj.getSelectedBizDays();
 		try {
 			manageEmailPageObj.clickOnEmailAutomationAuditLog();
+			Assert.assertTrue(manageEmailPageObj.isAuditModalExist());
+			sleep();
+			if(basePage.isElementPresent(manageEmailPageObj.emailAuditLogTable, 30)) {
+				test.log(LogStatus.INFO, "Audit table is Empty!!!!");
+			} else {
+				if(manageEmailPageObj.checkAuditLog(date, typeLevel, typeValue)) {
+					test.log(LogStatus.PASS, typeLevel + "field name successfully updated in audit logs!!!!");
+				} else {
+					test.log(LogStatus.FAIL, typeLevel + "field name not updated in audit logs!!!!");
+				}
+				
+				if(manageEmailPageObj.checkAuditLog(date, billPendingLevel, billPendingInQueue)) {
+					test.log(LogStatus.PASS, billPendingLevel + "field name successfully updated in audit logs!!!!");
+				} else {
+					test.log(LogStatus.FAIL, billPendingLevel + "field name not updated in audit logs!!!!");
+				}
+				
+				if(manageEmailPageObj.checkAuditLog(date, bizDaysLevel, bizDays)) {
+					test.log(LogStatus.PASS, bizDaysLevel + "field name successfully updated in audit logs!!!!");
+				} else {
+					test.log(LogStatus.FAIL, bizDaysLevel + "field name not updated in audit logs!!!!");
+				}
+			}
 			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to verify email audit log. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 32)
+	public void searchEmailAuditLogTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		String date = getCurrentDate(),
+		       level = "SaveETemplateForBills";
+		try {
+			Assert.assertTrue(manageEmailPageObj.isAuditModalExist());
+			if(basePage.isElementPresent(manageEmailPageObj.emailAuditLogTable, 30)) {
+				test.log(LogStatus.INFO, "Audit table is Empty!!!!");
+			} else {
+				manageEmailPageObj.setEmailAuditLogSearch(emailTemplateName);
+				if(manageEmailPageObj.checkAuditLog(date, level, emailTemplateName)) {
+					test.log(LogStatus.PASS, level + "field name successfully updated in audit logs!!!!");
+				} else {
+					test.log(LogStatus.FAIL, level + "field name not updated in audit logs!!!!");
+				}
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to search email audit log. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+
+	@Test(priority = 33)
+	public void sortEmailAuditLogTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		try {
+			Assert.assertTrue(manageEmailPageObj.isAuditModalExist());
+			if(basePage.isElementPresent(manageEmailPageObj.emailAuditLogTable, 30)) {
+				test.log(LogStatus.INFO, "Audit table is Empty!!!!");
+			} else {
+				manageEmailPageObj.clickOnFieldName();
+				if(manageEmailPageObj.fieldName.getAttribute("class").equals("sorting_asc") && manageEmailPageObj.isFieldNameAscendingOrder()) {
+					test.log(LogStatus.PASS, "field name sorted in ascending order!!!!");
+					takeScreenshot();
+					manageEmailPageObj.clickOnFieldName();
+					if(manageEmailPageObj.fieldName.getAttribute("class").equals("sorting_desc") && manageEmailPageObj.isFieldNameDescendingOrder()) {
+						test.log(LogStatus.PASS, "'field name' sorted in descending order!!!!");
+					} else {
+						test.log(LogStatus.FAIL, "Failed to sort 'field name' in descending order!!!!");
+					}
+				} else {
+					test.log(LogStatus.FAIL, "Failed to sort 'field name' in ascending order!!!!");
+				}
+			}
+			takeScreenshot();
+			manageEmailPageObj.clickOnCloseAuditLogModal();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to sort email audit log by file name. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+
+	// @Test(priority = 34)
+	public void manageDepartmentExpenseTC() {
+		homePageObj = new HomePage(driver);
+		companyDetailsPageObj = new CompanyDetailsPage(driver);
+		manageDepartmentExpensePageObj = new ManageDepartmentExpensePage(driver);
+		String message = "Data updated successfully";
+		String username = "Neha Roshan";
+		try {
+			sleep();
+			homePageObj.clickOnCompanies();
+			Thread.sleep(10000);
+			if(basePage.isElementPresent(companyListPageObj.companyListTable, 60)) {
+				test.log(LogStatus.INFO, "Company List loaded successfully. ");
+			} 
+			companyListPageObj.setCompanySearch(companyName);
+			sleep();
+			if (companyListPageObj.isCompanyExist(companyName)) {
+				companyListPageObj.clickOnDetails();
+				if (basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 40)) {
+					companyDetailsPageObj.clickOnManageEmailAutomation();
+					if(basePage.isElementPresent(manageDepartmentExpensePageObj.pageTitle, 40)) {
+						manageDepartmentExpensePageObj.clickOnUserView();
+						manageDepartmentExpensePageObj.setSearch(username);
+						sleep();
+						manageDepartmentExpensePageObj.selectUserOption(username);
+						manageDepartmentExpensePageObj.clickOnSave();
+						if(manageDepartmentExpensePageObj.getUsername().equals(username)) {
+							test.log(LogStatus.PASS, "user added successfully in user view!!!!");
+						} else {
+							test.log(LogStatus.FAIL, "Failed to add user in user view!!!!");
+						}
+						takeScreenshot();
+						if(manageDepartmentExpensePageObj.isDisableDepartment()) {
+							test.log(LogStatus.INFO, "All department toggle button is disabled!!!!");
+							manageDepartmentExpensePageObj.clickOnDepartmentToggle();
+							test.log(LogStatus.INFO, "Enabled All department toggle button!!!!");
+						}
+					}
+				}
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to manageDepartmentExpense. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 		
-	// @Test(priority = 32)
-	public void manageDepartmentExpenseTC() {
-		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+	// @Test(priority = 35)
+	public void departmentExpenseAuditLogTC() {
+		manageDepartmentExpensePageObj = new ManageDepartmentExpensePage(driver);
+		String date = getCurrentDateInFormat(),
+			   username ="neha@thinkbridge.in";
 		try {
+			manageDepartmentExpensePageObj.clickOnDepartmentAuditLog();
+			if(manageDepartmentExpensePageObj.isAuditModalExist()) {
+				if(basePage.isElementPresent(manageDepartmentExpensePageObj.departmentAuditLogTable, 30)) {
+					test.log(LogStatus.INFO, "Audit table is Empty!!!!");
+				} else {
+					if(manageDepartmentExpensePageObj.checkDepartmentAuditLog(date, username)) {
+						test.log(LogStatus.PASS, "Audit table updated successfully!!!!");
+					}
+				}
+			}
 			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to view department Expense Audit log. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	// @Test(priority = 35)
+	public void signOut() {
+		homePageObj = new HomePage(driver);
+		loginPageObj = new LoginPage(driver);
+		try {
+			homePageObj.clickOnProfileBar();
+			if(homePageObj.isprofileDropdownExist()) {
+				homePageObj.clickOnSignout();
+			}
+			if(basePage.isElementPresent(loginPageObj.loginDiv, 60)) {
+				test.log(LogStatus.PASS, "logged out successfully!!!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to logged out!!!!");
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to signout. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}

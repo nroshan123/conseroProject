@@ -1,7 +1,10 @@
 package pageclass;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -84,6 +87,21 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(xpath = "//select[contains(@class,'billsBizDaySelection')]")
 	WebElement billsBizDaySelection;
 	
+	@FindBy(xpath = "//span[@class='multiselect-selected-text']")
+	WebElement selectedBizDays;
+	
+	@FindBy(name = "billsType")
+	WebElement billsType;
+	
+	@FindBy(xpath = "//div[contains(@class,'billsFrequencyTypeDiv')]/label")
+	WebElement typeLevel;
+	
+	@FindBy(xpath = "//div[contains(@class,'cutoffDaysDiv')]/label")
+	WebElement billsPendingLevel;
+	
+	@FindBy(xpath = "//div[contains(@class,'billsBizDayDiv')]/label")
+	WebElement billsBizDayLevel;
+	
 	//Email audit logs
 	
 	@FindBy(xpath = "//button[text()='Email Automation Audit logs']")
@@ -95,17 +113,20 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(xpath = "//div[@id='emailEditLogsTable_filter']//input[@type='search']")
 	WebElement emailAuditLogSearch;
 	
-	@FindBy(xpath = "//table[@id='emailEditLogsTable']//tbody")
-	WebElement emailAuditLogTable;
+	@FindBy(xpath = "//table[@id='emailEditLogsTable']//tbody//tr//td[@class='dataTables_empty']")
+	public WebElement emailAuditLogTable;
 	
 	@FindBy(xpath = "//table[@id='emailEditLogsTable']//thead//tr//th[contains(text(),'Field Name')]")
-	WebElement fieldName;
+	public WebElement fieldName;
 
-	@FindBy(xpath = "//table[@id='emailEditLogsTable']//tbody//tr//td[3]")
-	List<WebElement> newValues;
-	
 	@FindBy(xpath = "//table[@id='emailEditLogsTable']//tbody//tr//td[1]")
 	List<WebElement> fieldNames;
+	
+	@FindBy(xpath = "//table[@id='emailEditLogsTable']//tbody//tr//td[5]")
+	List<WebElement> auditedDates;
+	
+	@FindBy(xpath = "//div[@id='showEmailEditLogModal']//div[@class='announcementModalHeader']//a[contains(@class,'close-circle')]")
+	WebElement closeAuditLogModal;
 	
 	public ManageEmailAutomationPage(WebDriver driver) {
 		super(driver);
@@ -221,9 +242,102 @@ public class ManageEmailAutomationPage extends BasePage {
 		this.clickOnSaveEmailFrequency();
 	}
 	
+	public String getTypeLevel() {
+		return typeLevel.getText().replace(":", "");
+	}
+	
+	public String getBillsPendingLevel() {
+		return billsPendingLevel.getText().replace(":", "");
+	}
+	
+	public String getBillsBizDayLevel() {
+		return billsBizDayLevel.getText().replace(":", "");
+	}
+	
+	public String getbizdaysCutOffDays() {
+		return bizdaysCutOffDays.getAttribute("value");
+	}
+	
+	public String getSelectedBizDays() {
+		return selectedBizDays.getText();
+	}
+	
+	public String getCheckedFrequency() {
+		String value = "";
+		if(billsType.isSelected()) {
+			value = billsType.getAttribute("value");
+		}
+		return value;
+	}
+	
 	//Email audit logs
 	
 	public void clickOnEmailAutomationAuditLog() {
 		emailAutomationAuditLog.click();
+	}
+	
+	public boolean isAuditModalExist() {
+		if(isElementPresent(emailAuditLogModal,60)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean checkAuditLog(String date, String field, String value) {
+		try {
+			for(int i=0; i<auditedDates.size(); i++) {
+				if(auditedDates.get(i).getText().contains(date)) {
+					 for(int j=0; i< fieldNames.size(); j++) {
+						if(fieldNames.get(j).getText().contains(field)) {
+						  WebElement newValue = driver.findElement(By.xpath("//table[@id='emailEditLogsTable']//tbody//tr[" + (j+1) + "]//td[3]"));
+						  if (newValue.getText().equals(value)) {
+							  return true;
+							}
+						}
+					 }
+				}
+			}
+		} catch(Exception e) {
+			return false;
+		}
+		return false;
+	}
+	
+	public void setEmailAuditLogSearch(String value) {
+		emailAuditLogSearch.sendKeys(value);
+	}
+	
+	public void clickOnFieldName() {
+		fieldName.click();
+	}
+	
+	public boolean isFieldNameAscendingOrder() {
+		List<String> list = new ArrayList<String>();
+		for (WebElement fieldName : fieldNames) {
+			list.add(fieldName.getText());
+		}
+		List<String> tempList= list;
+		Collections.sort(tempList);
+		if(tempList.equals(list)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isFieldNameDescendingOrder() {
+		List<String> list = new ArrayList<String>();
+		for (WebElement fieldName : fieldNames) {
+			list.add(fieldName.getText());
+		}
+		List<String> tempList= list;
+		Collections.sort(tempList, Collections.reverseOrder());
+		if(tempList.equals(list)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void clickOnCloseAuditLogModal() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", closeAuditLogModal);
 	}
 }

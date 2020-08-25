@@ -180,6 +180,10 @@ public class CompanyDetailsPage extends BasePage {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", manageEmailAutomation);
 	}
 	
+	public void clickOnManageDepartmentExpense() {
+		manageDepartmentExpense.click();
+	}
+	
 	public void clickOnRemoveTeamMember(String email) {
 		for(int i=0; i<memberEmailId.size(); i++) {
 			if(memberEmailId.get(i).getText().equals(email)) {
