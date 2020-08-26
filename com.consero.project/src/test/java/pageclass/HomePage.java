@@ -22,11 +22,20 @@ public class HomePage extends BasePage {
 	@FindBy(xpath = "//div[@id='sideNavList']//ul//li[@id='Companies']")
 	WebElement companies;
 	
+	@FindBy(id = "cmsDashboard")
+	WebElement dashboard;
+	
+	@FindBy(id = "Activities")
+	WebElement controlDock;
+	
 	@FindBy(xpath = "//li[@id='users']//ul[contains(@class,'sub-menu')]//li//a")
 	List<WebElement> userSubmenu;
 	
 	@FindBy(xpath = "//li[@id='Companies']//ul[contains(@class,'sub-menu')]//li//a")
 	List<WebElement> companiesSubmenu;
+	
+	@FindBy(xpath = "//li[@id='Activities']//ul[contains(@class,'sub-menu')]//li//a")
+	List<WebElement> controldockSubmenu;
 	
 	@FindBy(id = "header_profile_bar")
 	WebElement profileBar;
@@ -43,6 +52,10 @@ public class HomePage extends BasePage {
 		PageFactory.initElements(driver, this);
 	}
 	
+	public boolean isDashboardSelected() {
+		return dashboard.getAttribute("class").equals("active");
+	}
+	
 	public void moveToUsers() {
 		try {
 			Actions action = new Actions(driver);
@@ -56,6 +69,15 @@ public class HomePage extends BasePage {
 		try {
 			Actions action = new Actions(driver);
 			action.moveToElement(companies).build().perform();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void moveToControlDock() {
+		try {
+			Actions action = new Actions(driver);
+			action.moveToElement(controlDock).build().perform();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -100,6 +122,15 @@ public class HomePage extends BasePage {
 	
 	public void clickOnSignout() {
 		signout.click();
+	}
+	
+	public void selectControldockSubmennu(String name) {
+		for(WebElement submenu:controldockSubmenu) {
+			if(submenu.getText().equals(name)) {
+				((JavascriptExecutor) driver).executeScript("arguments[0].click()", submenu);
+				break;
+			}
+		}
 	}
 	
 }

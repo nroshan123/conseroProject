@@ -5,15 +5,15 @@
 		<listener class-name="utility.TestListner"></listener>
 	</listeners>
 
-	<parameter name="appurl" value="https://texpo-uat.eroms.works/" />
+	<parameter name="appurl" value="https://consero-prod-beta.azurewebsites.net/" />
 	
-	<test name="Test">
+	<!-- <test name="Test">
 		<classes>
 			<class name="testcases.ConseroAdminTestScript" />
 		</classes>
-	</test>
+	</test> -->
 	
-	<test name="Test">
+	<test name="Test1">
 		<classes>
 			<class name="testcases.ConseroManagerTestScript" />
 		</classes>

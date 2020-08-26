@@ -1,4 +1,4 @@
-package testcases;
+ package testcases;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import pageclass.AddBulkUserPage;
 import pageclass.AddCloseTemplatePage;
 import pageclass.CompanyDetailsPage;
 import pageclass.CompanyListPage;
-import pageclass.ControlDockPage;
+import pageclass.ActivityListPage;
 import pageclass.DeactivateBulkUserPage;
 import pageclass.AddCompanyPage;
 import pageclass.AddLinkPage;
@@ -57,13 +57,13 @@ public class ConseroAdminTestScript extends BaseTest {
 	AddCloseTemplatePage addCloseTemplatePageObj = null;
 	TemplateDetailsPage templateDetailsPageObj = null;
 	KickOffClosePage kickOffClosePageObj = null;
-	ControlDockPage controlDockPageObj = null;
+	ActivityListPage activityListPageObj = null;
 	KickOffsPage kickOffPageObj = null; 
 	ManageEmailAutomationPage manageEmailPageObj = null;
 	ManageDepartmentExpensePage manageDepartmentExpensePageObj = null;
 	
 	String sheetName = "credentials";
-	String adminUser = "prasanna@thinkbridge.in", adminPassword = "Consero123$";
+	String adminUser = "", adminPassword = "";
 	String companyName= "", username ="", emailTemplateName="";
 	
 	@BeforeMethod(alwaysRun = true)
@@ -81,13 +81,13 @@ public class ConseroAdminTestScript extends BaseTest {
 	@Test
 	public void loginTC(String appUrl) {
 		try {
-			/*List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
+			List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
 			for (int i = 0; i < TCData.size(); i++) {
 				if(TCData.get(i).get("role").equals("admin")) {
 					adminUser = TCData.get(i).get("email");
 					adminPassword = TCData.get(i).get("password");
 				}
-			}*/
+			}
 			loadConfig();
 			test.log(LogStatus.INFO, "Loading config file");
 			navigate(appUrl);
@@ -153,7 +153,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=3)
+	//@Test(priority=3)
 	public void addUserTC() {
 		addUserPageObj = new AddUserPage(driver);
 		userListPageObj = new UsersListPage(driver);
@@ -203,7 +203,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority = 4)
+	//@Test(priority = 4)
 	public void verifyWelcomeEmailTC() {
 		userListPageObj = new UsersListPage(driver);
 		String welcomeMessage = "Welcome Mail was send successfully to " + username,
@@ -236,7 +236,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority = 5)
+	//@Test(priority = 5)
 	public void activateDeactivateUserTC() {
 		userListPageObj = new UsersListPage(driver);
 		String deactiveContent = "Are you sure to deactivate", activeContent = "Are you sure to activate";
@@ -278,7 +278,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=6)
+	//@Test(priority=6)
 	public void addBulkUserTC() {
 		homePageObj = new HomePage(driver);
 		bulkUserPageObj = new AddBulkUserPage(driver);
@@ -313,7 +313,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=7)
+	//@Test(priority=7)
 	public void deactivateBulkUserTC() {
 		deactivateBulkUserPageObj = new DeactivateBulkUserPage(driver);
 		homePageObj = new HomePage(driver);
@@ -391,6 +391,7 @@ public class ConseroAdminTestScript extends BaseTest {
 			basePage.waitElementVisible(companyListPageObj.companyListTable, 60);
 			sleep();
 			companyListPageObj.setCompanySearch(companyName);
+			sleep();
 			if(companyListPageObj.isCompanyExist(companyName)) {
 				test.log(LogStatus.PASS, "Company created successfully!!");
 			} else {
@@ -403,7 +404,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-    @Test(priority = 10)
+   // @Test(priority = 10)
 	public void editCompanyTC() {
 		addCompanyPageObj = new AddCompanyPage(driver);
 		companyListPageObj = new CompanyListPage(driver);
@@ -477,7 +478,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=12)
+	//@Test(priority=12)
 	public void verifyButtonOnTeamMemberPageTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addTeamMemberPageObj = new AddTeamMemberPage(driver);
@@ -527,7 +528,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=13)
+	//@Test(priority=13)
 	public void addTeamMemberTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addTeamMemberPageObj = new AddTeamMemberPage(driver);
@@ -555,7 +556,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=14)
+	//@Test(priority=14)
 	public void removeTeamMemberTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		String emailId = "neha@thinkbridge.in";
@@ -582,7 +583,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=15)
+	//@Test(priority=15)
 	public void viewEmailLogsTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		viewEmailLogsPageObj = new ViewEmailLogsPage(driver);
@@ -629,7 +630,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=16)
+	//@Test(priority=16)
 	public void addLinkTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addLinkPageObj = new AddLinkPage(driver);
@@ -694,7 +695,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=17)
+	//@Test(priority=17)
 	public void editLinkTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addLinkPageObj = new AddLinkPage(driver);
@@ -715,7 +716,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=18)
+	//@Test(priority=18)
 	public void deleteLinkTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addLinkPageObj = new AddLinkPage(driver);
@@ -735,7 +736,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=19)
+	//@Test(priority=19)
 	public void addCloseTemplateTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		addCloseTemplatePageObj = new AddCloseTemplatePage(driver);
@@ -774,7 +775,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=20)
+	//@Test(priority=20)
 	public void validateCloseTemplateTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		templateDetailsPageObj = new TemplateDetailsPage(driver);
@@ -827,11 +828,11 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=22)
+	//@Test(priority=22)
 	public void kickOffSetupTC() {
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		kickOffClosePageObj = new KickOffClosePage(driver);
-		controlDockPageObj = new ControlDockPage(driver);
+		activityListPageObj = new ActivityListPage(driver);
 		
 		String message = "Kicked off template successfully.";
 		
@@ -853,7 +854,7 @@ public class ConseroAdminTestScript extends BaseTest {
 					test.log(LogStatus.INFO, "get success message!!!!");
 				}
 				
-				if(basePage.isElementPresent(controlDockPageObj.pageTitle, 60)) {
+				if(basePage.isElementPresent(activityListPageObj.pageTitle, 60)) {
 					test.log(LogStatus.PASS, "Redirected On Control Dock Page successfully!!!!");
 				} else {
 					test.log(LogStatus.FAIL, "Failed to redirect On Control Dock Page!!!!");
@@ -869,7 +870,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=23)
+	//@Test(priority=23)
 	public void kickOffsTC() {
 		homePageObj = new HomePage(driver);
 		companyListPageObj = new CompanyListPage(driver);
@@ -906,7 +907,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority = 24)
+	//@Test(priority = 24)
 	public void closeKickOffTC() {
 		kickOffPageObj = new KickOffsPage(driver);
 		String title = "Kickoffs For " + companyName,
@@ -941,10 +942,10 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority = 25)
+	//@Test(priority = 25)
 	public void bizDaysTC() {
 		kickOffPageObj = new KickOffsPage(driver);
-		controlDockPageObj = new ControlDockPage(driver);
+		activityListPageObj = new ActivityListPage(driver);
 		try {
 			kickOffPageObj.clickOnBizdays();
 			if(basePage.isElementPresent(kickOffPageObj.BizDaysTitle, 60)) {
@@ -960,7 +961,7 @@ public class ConseroAdminTestScript extends BaseTest {
 				}
 				kickOffPageObj.clickOnMoveDates();
 				
-				if(basePage.isElementPresent(controlDockPageObj.pageTitle, 60)) {
+				if(basePage.isElementPresent(activityListPageObj.pageTitle, 60)) {
 					test.log(LogStatus.PASS, "Redirected On Control Dock Page successfully!!!!");
 				} else {
 					test.log(LogStatus.FAIL, "Failed to redirect On Control Dock Page!!!!");
@@ -1009,6 +1010,7 @@ public class ConseroAdminTestScript extends BaseTest {
 					companyDetailsPageObj.clickOnManageEmailAutomation();
 					if (basePage.isElementPresent(manageEmailPageObj.pageTitle, 60)) {
 						test.log(LogStatus.PASS, "'Manage Email Automation' page opened successfully!!");
+						sleep();
 						manageEmailPageObj.clickOnAddNewEmailTemplate();
 						Assert.assertTrue(manageEmailPageObj.isModalExist());
 						manageEmailPageObj.setNewBillsEmailTemplateName(emailTemplateName);
@@ -1034,7 +1036,10 @@ public class ConseroAdminTestScript extends BaseTest {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
 		String from = "2",
 			   successMessage = "Email Reminder Level Configured successfully";
+		System.out.println(emailTemplateName);
 		try {
+			sleep();
+			Assert.assertTrue(manageEmailPageObj.isEmailReminderLevelEnabled());
 			manageEmailPageObj.clickOnEmailReminderLevel();
 			manageEmailPageObj.setReminderLevelDetails(from, emailTemplateName);
 			if(basePage.checkSuccessMessage(successMessage)) {
@@ -1064,13 +1069,17 @@ public class ConseroAdminTestScript extends BaseTest {
 		String days= "2";
 		String successMessage = "Email Frequency Configured Successfully";
 		try {
+			sleep();
+			Assert.assertTrue(manageEmailPageObj.isEmailReminderLevelEnabled());
 			manageEmailPageObj.clickOnEmailFrequency();
+			sleep();
 			manageEmailPageObj.clickOnWeekDays();
 			manageEmailPageObj.setWeekDaysDetails(days);
 			if(basePage.checkSuccessMessage(successMessage)) {
 				test.log(LogStatus.PASS, "email frequency added successfully for week days!!!!");
 			}
 			takeScreenshot();
+			sleep();
 			manageEmailPageObj.clickOnBizDays();
 			manageEmailPageObj.setBizDaysDetails(days);
 			if(basePage.checkSuccessMessage(successMessage)) {
@@ -1126,30 +1135,6 @@ public class ConseroAdminTestScript extends BaseTest {
 	}
 	
 	@Test(priority = 32)
-	public void searchEmailAuditLogTC() {
-		manageEmailPageObj = new ManageEmailAutomationPage(driver);
-		String date = getCurrentDate(),
-		       level = "SaveETemplateForBills";
-		try {
-			Assert.assertTrue(manageEmailPageObj.isAuditModalExist());
-			if(basePage.isElementPresent(manageEmailPageObj.emailAuditLogTable, 30)) {
-				test.log(LogStatus.INFO, "Audit table is Empty!!!!");
-			} else {
-				manageEmailPageObj.setEmailAuditLogSearch(emailTemplateName);
-				if(manageEmailPageObj.checkAuditLog(date, level, emailTemplateName)) {
-					test.log(LogStatus.PASS, level + "field name successfully updated in audit logs!!!!");
-				} else {
-					test.log(LogStatus.FAIL, level + "field name not updated in audit logs!!!!");
-				}
-			}
-			takeScreenshot();
-		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to search email audit log. " + ExceptionUtils.getStackTrace(e));
-			e.printStackTrace();
-		}
-	}
-
-	@Test(priority = 33)
 	public void sortEmailAuditLogTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
 		try {
@@ -1172,19 +1157,44 @@ public class ConseroAdminTestScript extends BaseTest {
 				}
 			}
 			takeScreenshot();
-			manageEmailPageObj.clickOnCloseAuditLogModal();
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to sort email audit log by file name. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
+	
+	@Test(priority = 33)
+	public void searchEmailAuditLogTC() {
+		manageEmailPageObj = new ManageEmailAutomationPage(driver);
+		String date = getCurrentDateInFormat(),
+		       level = "SaveETemplateForBills";
+		try {
+			Assert.assertTrue(manageEmailPageObj.isAuditModalExist());
+			if(basePage.isElementPresent(manageEmailPageObj.emailAuditLogTable, 30)) {
+				test.log(LogStatus.INFO, "Audit table is Empty!!!!");
+			} else {
+				manageEmailPageObj.setEmailAuditLogSearch(emailTemplateName);
+				if(manageEmailPageObj.checkAuditLog(date, level, emailTemplateName)) {
+					test.log(LogStatus.PASS, level + "field name successfully updated in audit logs!!!!");
+				} else {
+					test.log(LogStatus.FAIL, level + "field name not updated in audit logs!!!!");
+				}
+			}
+			takeScreenshot();
+			manageEmailPageObj.clickOnCloseAuditLogModal();
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to search email audit log. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
 
-	// @Test(priority = 34)
+
+	@Test(priority = 34)
 	public void manageDepartmentExpenseTC() {
 		homePageObj = new HomePage(driver);
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		manageDepartmentExpensePageObj = new ManageDepartmentExpensePage(driver);
-		String message = "Data updated successfully";
+//		String message = "Data updated successfully";
 		String username = "Neha Roshan";
 		try {
 			sleep();
@@ -1198,8 +1208,9 @@ public class ConseroAdminTestScript extends BaseTest {
 			if (companyListPageObj.isCompanyExist(companyName)) {
 				companyListPageObj.clickOnDetails();
 				if (basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 40)) {
-					companyDetailsPageObj.clickOnManageEmailAutomation();
+					companyDetailsPageObj.clickOnManageDepartmentExpense();
 					if(basePage.isElementPresent(manageDepartmentExpensePageObj.pageTitle, 40)) {
+						sleep();
 						manageDepartmentExpensePageObj.clickOnUserView();
 						manageDepartmentExpensePageObj.setSearch(username);
 						sleep();
@@ -1226,12 +1237,13 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 		
-	// @Test(priority = 35)
+	@Test(priority = 35)
 	public void departmentExpenseAuditLogTC() {
 		manageDepartmentExpensePageObj = new ManageDepartmentExpensePage(driver);
 		String date = getCurrentDateInFormat(),
 			   username ="neha@thinkbridge.in";
 		try {
+			Assert.assertTrue(basePage.isElementPresent(manageDepartmentExpensePageObj.pageTitle, 40));
 			manageDepartmentExpensePageObj.clickOnDepartmentAuditLog();
 			if(manageDepartmentExpensePageObj.isAuditModalExist()) {
 				if(basePage.isElementPresent(manageDepartmentExpensePageObj.departmentAuditLogTable, 30)) {
@@ -1243,13 +1255,14 @@ public class ConseroAdminTestScript extends BaseTest {
 				}
 			}
 			takeScreenshot();
+			manageDepartmentExpensePageObj.clickOnCloseAuditLogModal();
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to view department Expense Audit log. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	// @Test(priority = 35)
+	@Test(priority = 36)
 	public void signOut() {
 		homePageObj = new HomePage(driver);
 		loginPageObj = new LoginPage(driver);

@@ -3,6 +3,7 @@ package pageclass;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -54,6 +55,9 @@ public class ManageDepartmentExpensePage extends BasePage{
 	
 	@FindBy(xpath = "//table[@id='departmentExpenseAuditLogsTable']//tbody//tr//td[6]")
 	List<WebElement> auditedDates;
+	
+	@FindBy(xpath = "//div[@id='showDepartmentAuditLogModal']//div[@class='announcementModalHeader']//a[contains(@class,'close-circle')]")
+	WebElement closeAuditLogModal;
 	
 	public ManageDepartmentExpensePage(WebDriver driver) {
 		super(driver);
@@ -137,5 +141,9 @@ public class ManageDepartmentExpensePage extends BasePage{
 			return false;
 		}
 		return false;
+	}
+	
+	public void clickOnCloseAuditLogModal() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", closeAuditLogModal);
 	}
 }

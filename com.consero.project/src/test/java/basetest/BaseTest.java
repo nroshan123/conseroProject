@@ -39,6 +39,8 @@ public class BaseTest {
 	public ExtentTest test=null;
 	public SoftAssert softAssert = new SoftAssert();	
 	
+	public static String companyName = "";
+	
 	public WebDriver getDriver() {
         return driver;
     }
@@ -83,7 +85,7 @@ public class BaseTest {
 	}
 
 	public void navigate(String appUrl) {
-		driver.get("https://consero-prod-beta.azurewebsites.net/");
+		driver.get(appUrl);
 	}
 	
 	/*

@@ -18,7 +18,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(xpath = "//div[@class='pageTitleSection']//div[contains(text(),'Manage Email Automation')]")
 	public WebElement pageTitle;
 	
-	@FindBy(xpath = "//button[text()='Add New Email Template']")
+	@FindBy(xpath = "//button[@name='Add New Template']")
 	WebElement addNewEmailTemplate;
 	
 	@FindBy(xpath = "//div[@id='addNewEmailTemplateModal']/div[@class='modal-dialog']")
@@ -36,7 +36,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(xpath = "//table[@id='templateListForBills']//tbody//tr//td[1]")
 	List<WebElement> emailTemplateNames;
 	
-	@FindBy(xpath = "//span[contains(text(),'Email Reminder Level')]")
+	@FindBy(xpath = "//div[contains(@class,'billsReminderCountLevel')]")
 	WebElement emailReminderLevel;
 	
 	@FindBy(id = "reminderLevelBillsTable_wrapper")
@@ -45,7 +45,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(name = "reminderLevelToForBills")
 	WebElement reminderLevelToForBills;
 	
-	@FindBy(id = "templateId")
+	@FindBy(xpath = "//table[@id='reminderLevelBillsTable']//select[@id='templateId']")
 	WebElement templateId;
 	
 	@FindBy(xpath = "//a[text()='Add Reminder Level']")
@@ -86,6 +86,12 @@ public class ManageEmailAutomationPage extends BasePage {
 	
 	@FindBy(xpath = "//select[contains(@class,'billsBizDaySelection')]")
 	WebElement billsBizDaySelection;
+	
+	@FindBy(xpath = "//select[contains(@class,'billsBizDaySelection')]//following-sibling::div/button[contains(@class,'multiselect')]")
+	WebElement bizDayDropdown;
+	
+	@FindBy(xpath = "//select[contains(@class,'billsBizDaySelection')]//following-sibling::div/ul[contains(@class,'dropdown-menu')]//li[not(contains(@class,'multiselect-all'))]")
+	List<WebElement> bizDayOptions;
 	
 	@FindBy(xpath = "//span[@class='multiselect-selected-text']")
 	WebElement selectedBizDays;
@@ -168,6 +174,11 @@ public class ManageEmailAutomationPage extends BasePage {
 		emailReminderLevel.click();
 	}
 	
+	public boolean isEmailReminderLevelEnabled() {
+		return emailReminderLevel.isEnabled();
+		
+	}
+	
 	public void setReminderLevelToForBills(String from) {
 		reminderLevelToForBills.sendKeys(from);
 	}
@@ -195,6 +206,10 @@ public class ManageEmailAutomationPage extends BasePage {
 	
 	//Email Frequency
 	
+	public boolean isEmailFrequencyLevelEnabled() {
+		return emailFrequency.isEnabled();
+	}
+	
 	public void clickOnEmailFrequency() {
 		emailFrequency.click();
 	}
@@ -216,17 +231,21 @@ public class ManageEmailAutomationPage extends BasePage {
 	}
 	
 	public void clickOnSaveEmailFrequency() {
-		saveEmailFrequency.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", saveEmailFrequency);
+//		saveEmailFrequency.click();
 	}
 	
 	public void setBizdaysCutOffDays(String day) {
 		bizdaysCutOffDays.sendKeys(day);
 	}
 	
+	public void clickOnBizDaysDropdown() {
+		bizDayDropdown.click();
+	}
+	
 	public void selectBillsBizDaySelection() {
-		Select select = new Select(billsBizDaySelection);
 		for(int i=0; i<=5; i++) {
-			select.selectByIndex(i);
+			bizDayOptions.get(i).click();
 		}
 	}
 	
@@ -238,6 +257,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	
 	public void setBizDaysDetails(String days) {
 		this.setBizdaysCutOffDays(days);
+		this.clickOnBizDaysDropdown();
 		this.selectBillsBizDaySelection();
 		this.clickOnSaveEmailFrequency();
 	}
@@ -259,7 +279,8 @@ public class ManageEmailAutomationPage extends BasePage {
 	}
 	
 	public String getSelectedBizDays() {
-		return selectedBizDays.getText();
+		System.out.println(selectedBizDays.getAttribute("title"));
+		return selectedBizDays.getAttribute("title").replace(" ", "");
 	}
 	
 	public String getCheckedFrequency() {

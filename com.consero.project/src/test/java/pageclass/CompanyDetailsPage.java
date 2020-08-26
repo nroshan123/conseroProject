@@ -181,7 +181,7 @@ public class CompanyDetailsPage extends BasePage {
 	}
 	
 	public void clickOnManageDepartmentExpense() {
-		manageDepartmentExpense.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", manageDepartmentExpense);
 	}
 	
 	public void clickOnRemoveTeamMember(String email) {
