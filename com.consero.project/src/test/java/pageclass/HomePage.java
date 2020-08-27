@@ -91,6 +91,10 @@ public class HomePage extends BasePage {
 		users.click();
 	}
 	
+	public void clickOnControlDock() {
+		controlDock.click();
+	}
+	
 	public void selectUserSubmennu(String name) {
 		for(WebElement submenu:userSubmenu) {
 			if(submenu.getText().equals(name)) {

@@ -95,6 +95,44 @@ public class AddActivityPage extends BasePage {
 	@FindBy(id = "reviewer2")
 	WebElement reviewerTwoLabel;
 	
+	//non close activity
+	
+	@FindBy(id = "recurrenceTab")
+	WebElement recurrenceTab;
+	
+	@FindBy(xpath = "//div[@id='SelectPattern']//input[@id='Rb+1']")
+	WebElement oneTime;
+	
+	@FindBy(xpath = "//div[@id='SelectPattern']//input[@id='Rb+2']")
+	WebElement daily;
+	
+	@FindBy(xpath = "//div[@id='SelectPattern']//input[@id='Rb+3']")
+	WebElement weekly;
+	
+	@FindBy(xpath = "//div[@id='SelectPattern']//input[@id='Rb+4']")
+	WebElement monthly;
+	
+	@FindBy(id = "IsSubActivity")
+	WebElement isSubActivity;
+	
+	@FindBy(id = "getDueDates")
+	WebElement validateDueDate;
+	
+	@FindBy(id = "RelaventParentActivity")
+	WebElement relaventParentActivity;
+	
+	@FindBy(id = "SaveAdhocActivity")
+	WebElement saveAdhocActivity;
+	
+	@FindBy(id = "RelaventChildActivities")
+	WebElement relaventChildActivities;
+	
+	@FindBy(id = "SubActivityField")
+	WebElement subActivityField;
+	
+	@FindBy(id = "NonCloseCalender")
+	WebElement nonCloseCalender;
+	
 	public AddActivityPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -123,6 +161,10 @@ public class AddActivityPage extends BasePage {
 			return true;
 		}
 		return false;
+	}
+	
+	public void clickOnActivityTab() {
+		activityTab.click();
 	}
 	
 	public void setActivityDescritption(String description) {
@@ -288,5 +330,44 @@ public class AddActivityPage extends BasePage {
 		this.selectReviewerTwo(reviewer);
 		this.setDueForReveiewOne(day);
 		this.setReviewOneDuration(duration);
+	}
+	
+	//non close activity 
+	
+	public boolean isRecurrenceTabSelected() {
+		return recurrenceTab.getAttribute("class").equals("active");
+	}
+	
+	public boolean isRelaventParentActivity() {
+		return isElementPresent(relaventParentActivity,40);
+	}
+	
+	public boolean isRelaventChildActivities() {
+		return isElementPresent(relaventChildActivities,40);
+	}
+	
+	public boolean isSubActivityField() {
+		return isElementPresent(subActivityField,40);
+	}
+	
+	public void clickOnIsSubActivity() {
+		isSubActivity.click();
+	}
+	
+	public void clickOnValidateDueDate() {
+		validateDueDate.click();
+	}
+	
+	public void clickOnNonCloseCalender() {
+		nonCloseCalender.click();
+	}
+	
+	public void setNonCloseActivityDetails(String description, String day, String owner) {
+		this.setActivityDescritption(description);
+		this.selectFunction();
+		this.selectTower();
+		this.clickOnNonCloseCalender();
+		selectDateFromCalendar(day);
+		this.selectOwner(owner);
 	}
 }

@@ -220,8 +220,8 @@ public class BaseTest {
 		  return false;
 		}
 	
-	public String generateCurrentDateInFormatDD_MM_YYYY() {
-		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+	public String generateCurrentDateInFormatM_DD_YYYY() {
+		DateFormat dateFormat = new SimpleDateFormat("M-dd-yyyy");
 		Date dateobj = new Date();
 		return dateFormat.format(dateobj);
 	}

@@ -76,7 +76,10 @@ public class BasePage {
   	
   	@FindBy(xpath = "//div[@class='toaster-height']")
   	WebElement toastContent;
-	
+
+  	@FindBy(xpath = "//div[@id='ui-datepicker-div']//table//tbody//tr//td[not(contains(@class,'ui-state-disabled'))]")
+	List<WebElement> datePickerDates;
+  	
 	public BasePage(WebDriver driver) {
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
@@ -244,6 +247,15 @@ public class BasePage {
 			return true;
 		}
 		return false;
+	}
+	
+	public void selectDateFromCalendar(String date) {
+		for (WebElement dueOnDate : datePickerDates) {
+			if (dueOnDate.getText().equals(date)) {
+				dueOnDate.click();
+				break;
+			}
+		}
 	}
 
 }
