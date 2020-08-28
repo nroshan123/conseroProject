@@ -3,6 +3,7 @@ package pageclass;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -55,6 +56,21 @@ public class ActivityListPage extends BasePage{
 	@FindBy(id = "activitiesheadertable")
 	WebElement activitiesHeadertable;
 	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[4]//a")
+	WebElement activityDetails;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[2]")
+	WebElement function;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[1]")
+	WebElement companyName;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[6]")
+	WebElement assignedTo;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[5]")
+	WebElement status;
+	
 	public ActivityListPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -74,7 +90,7 @@ public class ActivityListPage extends BasePage{
 	}
 	
 	public void clickOnEdit() {
-		edit.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", edit);
 	}
 	
 	public void selectActivityType(String value) {
@@ -127,7 +143,7 @@ public class ActivityListPage extends BasePage{
 	}
 	
 	public void clickOnBtnActivityheader() {
-		btnActivityheader.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", btnActivityheader);
 	}
 	
 	public boolean isActivitiesHeadertableVisible() {
@@ -143,5 +159,33 @@ public class ActivityListPage extends BasePage{
 	
 	public boolean isclearFilterExist() {
 		return isElementPresent(clearFilter, 40);
+	}
+	
+	public void clickOnActivityDetails() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", activityDetails);
+	}
+	
+	public String getActivityDetails() {
+		return activityDetails.getText();
+	}
+	
+	public String getFunction() {
+		return function.getText();
+	}
+	
+	public String getCompanyName() {
+		return companyName.getText();
+	}
+	
+	public String getAssignedTo() {
+		return assignedTo.getText();
+	}
+	
+	public String getStatus() {
+		return status.getText();
+	}
+	
+	public boolean isActivityTableExist() {
+		return isElementPresent(activityTable,60);
 	}
 }

@@ -133,6 +133,14 @@ public class AddActivityPage extends BasePage {
 	@FindBy(id = "NonCloseCalender")
 	WebElement nonCloseCalender;
 	
+	//edit activity
+	
+	@FindBy(id = "EditActivityConfirm")
+	WebElement editActivityConfirm;
+	
+	@FindBy(xpath = "//div[@id='EditActivityConfirm']//input[@value='Yes']")
+	WebElement yes;
+	
 	public AddActivityPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -369,5 +377,15 @@ public class AddActivityPage extends BasePage {
 		this.clickOnNonCloseCalender();
 		selectDateFromCalendar(day);
 		this.selectOwner(owner);
+	}
+	
+	//Edit activity
+	
+	public boolean isEditActivityConfirmExist() {
+		return isElementPresent(editActivityConfirm,30);
+	}
+	
+	public void clickOnYes() {
+		yes.click();
 	}
 }
