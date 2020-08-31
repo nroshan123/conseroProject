@@ -138,6 +138,9 @@ public class AddActivityPage extends BasePage {
 	@FindBy(id = "EditActivityConfirm")
 	WebElement editActivityConfirm;
 	
+	@FindBy(xpath = "//div[@id='EditActivityConfirm']//h4")
+	WebElement editModalContent;
+	
 	@FindBy(xpath = "//div[@id='EditActivityConfirm']//input[@value='Yes']")
 	WebElement yes;
 	
@@ -175,7 +178,14 @@ public class AddActivityPage extends BasePage {
 		activityTab.click();
 	}
 	
+	public String getActivityDescription() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",activityDescription).toString(); 
+	}
+	
 	public void setActivityDescritption(String description) {
+		if(!Strings.isNullOrEmpty(this.getActivityDescription())) {
+			activityDescription.clear();
+		}
 		activityDescription.sendKeys(description);
 	}
 	
@@ -381,11 +391,22 @@ public class AddActivityPage extends BasePage {
 	
 	//Edit activity
 	
-	public boolean isEditActivityConfirmExist() {
+	public boolean isConfirmModalExist() {
 		return isElementPresent(editActivityConfirm,30);
+	}
+	
+	public String getEditModalContent() {
+		return editModalContent.getText().trim();
+	}
+	
+	public void confirmEditModal(String content) {
+		if(this.isConfirmModalExist() && this.getEditModalContent().equals(content)) {
+			this.clickOnYes();
+		}
 	}
 	
 	public void clickOnYes() {
 		yes.click();
 	}
+	
 }

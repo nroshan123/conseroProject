@@ -35,7 +35,7 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td//a[@class='editActivityLink']")
 	WebElement edit;
 	
-	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr")
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td[@class='dataTables_empty']")
 	public WebElement activityTable;
 	
 	@FindBy(id = "selectedActivityType")
@@ -59,6 +59,9 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[4]//a")
 	WebElement activityDetails;
 	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td[4]//a")
+	List<WebElement> activities;
+	
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[2]")
 	WebElement function;
 	
@@ -70,6 +73,12 @@ public class ActivityListPage extends BasePage{
 	
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[5]")
 	WebElement status;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td//button[contains(@class,'hasNotesButton')]")
+	WebElement noteButton;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//div[contains(@class,'note-shadow')]")
+	WebElement noteContainer;
 	
 	public ActivityListPage(WebDriver driver) {
 		super(driver);
@@ -109,10 +118,6 @@ public class ActivityListPage extends BasePage{
 	
 	public void setSearch(String value) {
 		search.sendKeys(value);
-	}
-	
-	public String getActivityTable() {
-		return activityTable.getText();
 	}
 	
 	public void selctShowEntries() {
@@ -188,4 +193,26 @@ public class ActivityListPage extends BasePage{
 	public boolean isActivityTableExist() {
 		return isElementPresent(activityTable,60);
 	}
+	
+	public boolean isActivitiesExist(String name) {
+		for(WebElement activity:activities) {
+			if(activity.getText().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isNoteButtonExist() {
+		return isElementPresent(noteButton,60);
+	}
+	
+	public void clickOnNoteButton() {
+		noteButton.click();
+	}
+	
+	public boolean isNoteContainerExist() {
+		return isElementPresent(noteContainer,60);
+	}
+	
 }
