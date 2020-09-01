@@ -144,6 +144,14 @@ public class AddActivityPage extends BasePage {
 	@FindBy(xpath = "//div[@id='EditActivityConfirm']//input[@value='Yes']")
 	WebElement yes;
 	
+	//add subactivity
+	
+	@FindBy(id = "AddSubActivityButton")
+	WebElement addSubActivity;
+	
+	@FindBy(id = "cancelEditActivity")
+	WebElement cancelEditActivity;
+	
 	public AddActivityPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -407,6 +415,26 @@ public class AddActivityPage extends BasePage {
 	
 	public void clickOnYes() {
 		yes.click();
+	}
+	
+	public void clickOnAddSubActivity() {
+		addSubActivity.click();
+	}
+	
+	public void clickOnCancelEditActivity() {
+		cancelEditActivity.click();
+	}
+	
+	public void setAddSubActivityDetails(String description) {
+		if (this.isactivityModalExist()) {
+			try {
+				this.setActivityDescritption(description);
+				this.clickOnAddSubActivity();
+				this.waitUntilElementInvisible("//div[contains(@class,'addActivityDialogue')]", 30);
+			} catch (Exception e) {
+				this.clickOnCancelEditActivity();
+			}
+		}
 	}
 	
 }

@@ -38,6 +38,18 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(xpath = "//div[@class='stats']//div[1]//span[contains(@class,'stat-value')]")
 	WebElement status;
 	
+	@FindBy(id = "submitStart")
+	WebElement start;
+	
+	@FindBy(id = "submitMarkAsComplete")
+	WebElement markAsComplete;
+	
+	@FindBy(id = "submitRecall")
+	WebElement recall;
+	
+	@FindBy(xpath = "//table[@id='flowTable']//tbody//tr//td[1]")
+	List<WebElement> activityFlows;
+	
 	//notes
 	
 	@FindBy(id = "notesMainDiv")
@@ -54,9 +66,6 @@ public class ActivityDetailsPage extends BasePage {
 	
 	@FindBy(xpath = "//div[@class='popover-content']//button[text()='Add']")
 	WebElement add;
-	
-	@FindBy(id = "submitStart")
-	WebElement start;
 	
 	@FindBy(id = "ActivityNotes")
 	WebElement noteDiv;
@@ -117,6 +126,32 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(id = "LinkName")
 	WebElement linkName;
 	
+	//parent child Activity
+	
+	@FindBy(id = "btnConvertSubActivity")
+	WebElement convertSubActivity;
+	
+	@FindBy(id = "btnAttachSubActivity")
+	WebElement attachSubactivity;
+	
+	@FindBy(id = "btnaddSubActivity")
+	WebElement addSubactivity;
+	
+	@FindBy(xpath = "//div[@id='ChildActivities']//table")
+	WebElement childActivitiesTabel;
+	
+	@FindBy(xpath = "//div[@id='ChildActivities']//table//tbody//tr//td[1]")
+	List<WebElement> subActivityNames;
+	
+	@FindBy(id = "RelavantSubActivitiesSection")
+	public WebElement attachSubactivitySection;
+	
+	@FindBy(id = "RelavantSubActivitiesToAttach")
+	WebElement subactivityDropdown;
+	
+	@FindBy(id = "ConfirmActivityChange")
+	WebElement confirmActivityChange;
+	
 	public ActivityDetailsPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -154,6 +189,14 @@ public class ActivityDetailsPage extends BasePage {
 		return isElementPresent(start, 40);
 	}
 	
+	public boolean isMarkAsCompleteButtonExist() {
+		return isElementPresent(markAsComplete, 40);
+	}
+	
+	public boolean isRecallButtonExist() {
+		return isElementPresent(recall, 40);
+	}
+	
 	public boolean isBackToActivityButtonExist() {
 		return isElementPresent(backToActivities, 40);
 	}
@@ -166,9 +209,26 @@ public class ActivityDetailsPage extends BasePage {
 		start.click();
 	}
 	
+	public void clickOnMarkAsComplete() {
+		markAsComplete.click();
+	}
+	
+	public void clickOnRecall() {
+		recall.click();
+	}
+	
 	public boolean checkPanelExist() {
 		if(isElementPresent(documentsMainDiv, 30) && isElementPresent(notesMainDiv, 30) && isElementPresent(activityFlowTable, 30)) {
 			return true;
+		}
+		return false;
+	}
+	
+	public boolean isAssignedToReviewer(String name) {
+		for(WebElement activityFlow:activityFlows) {
+			if(activityFlow.getText().equals(name)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -259,6 +319,10 @@ public class ActivityDetailsPage extends BasePage {
 		upload.click();
 	}
 	
+	public void clickOnLink() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", link);
+	}
+	
 	public void setLinkDocument(String link) {
 		linkDocument.sendKeys(link);
 	}
@@ -286,4 +350,51 @@ public class ActivityDetailsPage extends BasePage {
 		return documentName.getText();
 	}
 	
+	//parent child activity
+	
+	public boolean checkSubActivityButtonExist() {
+		if(isElementPresent(convertSubActivity, 60) && isElementPresent(addSubactivity, 60)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void clickOnConvertSubActivity() {
+		convertSubActivity.click();
+	}
+	
+	public void clickOnAddSubactivity() {
+		addSubactivity.click();
+	}
+	
+	public void clickOnAttachSubactivity() {
+		attachSubactivity.click();
+	}
+	
+	public boolean isSubActivityAdded(String name) {
+		if(isElementPresent(childActivitiesTabel, 60)) {
+			for(WebElement subActivityName:subActivityNames) {
+				if(subActivityName.getText().equals(name)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	public void selectSubactivity() {
+		Select select = new Select(subactivityDropdown);
+		for(int i=0;i<3; i++) {
+			select.selectByIndex(i);
+		}
+	}
+	
+	public boolean isAttachSubActivityButtonExist() {
+		return isElementPresent(attachSubactivity, 60);
+	}
+	
+	public void clickOnConfirmActivityChange() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", confirmActivityChange);
+	}
 }

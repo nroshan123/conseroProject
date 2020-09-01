@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
 
 public class HomePage extends BasePage {
 
@@ -15,6 +16,12 @@ public class HomePage extends BasePage {
 
 	@FindBy(xpath = "//img[@class='company_logo']")
 	public WebElement companyLogo;
+	
+	@FindBy(id = "SelectedCompany")
+	WebElement entityDropdown;
+	
+	@FindBy(id = "changeCompDashSideBar")
+	WebElement go;
 	
 	@FindBy(xpath = "//div[@id='sideNavList']//ul//li[@id='users']")
 	WebElement users;
@@ -46,10 +53,22 @@ public class HomePage extends BasePage {
 	@FindBy(xpath = "//ul[contains(@class,'header-profile-dropdown-menu')]")
 	WebElement profileDropdown;
 	
+	@FindBy(xpath = "//ul[contains(@class,'page-sidebar-menu')]//li//a[@data-tooltip-text='ControlDock™']")
+	WebElement controlDockInSimpl;
+	
 	public HomePage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
+	}
+	
+	public void selectEntity(String value) {
+		Select select = new Select(entityDropdown);
+		select.selectByVisibleText(value);
+	}
+	
+	public void clickOnGo() {
+		go.click();
 	}
 	
 	public boolean isDashboardSelected() {
@@ -137,4 +156,7 @@ public class HomePage extends BasePage {
 		}
 	}
 	
+	public void clickOnControlDockInSimpl() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", controlDockInSimpl);
+	}
 }

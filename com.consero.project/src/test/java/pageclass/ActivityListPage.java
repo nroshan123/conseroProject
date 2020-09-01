@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.util.Strings;
 
 public class ActivityListPage extends BasePage{
 	
@@ -80,6 +81,27 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//div[contains(@class,'note-shadow')]")
 	WebElement noteContainer;
 	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td//i[@class='fa fa-sitemap']")
+	WebElement treeIcon;
+	
+	@FindBy(id = "LoadActivityTreeView")
+	WebElement activityTreeModal;
+	
+	@FindBy(xpath = "//div[@id='treeViewStructureTable_filter']//input[@type='search']")
+	WebElement searchActivityInTree;
+	
+	@FindBy(xpath = "//table[@id='treeViewStructureTable']//tbody//tr[1]//td[2]//a")
+	WebElement subActivity;
+	
+	@FindBy(xpath = "//div[@id='LoadActivityTreeView']//button[contains(@class,'buttons-excel')]")
+	WebElement excelTreeView;
+	
+	@FindBy(xpath = "//div[@id='LoadActivityTreeView']//button[contains(@class,'buttons-csv')]")
+	WebElement csvTreeView;
+	
+	@FindBy(id = "btnBackToActivityIndex")
+	WebElement btnBackToActivity;
+	
 	public ActivityListPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -116,7 +138,14 @@ public class ActivityListPage extends BasePage{
 		clearFilter.click();
 	}
 	
+	public String getSearch() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",search).toString();
+	}
+	
 	public void setSearch(String value) {
+		if(!Strings.isNullOrEmpty(this.getSearch())) {
+			search.clear();
+		}
 		search.sendKeys(value);
 	}
 	
@@ -213,6 +242,45 @@ public class ActivityListPage extends BasePage{
 	
 	public boolean isNoteContainerExist() {
 		return isElementPresent(noteContainer,60);
+	}
+	
+	public boolean isTreeIconExist() {
+		return isElementPresent(treeIcon,60);
+	}
+	
+	public void clickOnTreeIcon() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", treeIcon);
+	}
+	
+	public boolean isActivityTreeModalExist() {
+		return isElementPresent(activityTreeModal,60);
+	}
+	
+	public String getSearchActivityInTree() {
+		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",searchActivityInTree).toString();
+	}
+	
+	public void setSearchActivityInTree(String activity) {
+		if(!Strings.isNullOrEmpty(this.getSearchActivityInTree())) {
+			searchActivityInTree.clear();
+		}
+		searchActivityInTree.sendKeys(activity);
+	}
+	
+	public String getSubActivity() {
+		return subActivity.getText();
+	}
+	
+	public void clickOnExcelTreeView() {
+		excelTreeView.click();
+	}
+	
+	public void clickOnCsvTreeView() {
+		csvTreeView.click();
+	}
+	
+	public void clickOnBtnBackToActivity() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", btnBackToActivity);
 	}
 	
 }

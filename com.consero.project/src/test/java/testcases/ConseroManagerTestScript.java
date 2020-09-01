@@ -21,6 +21,7 @@ import pageclass.ActivityListPage;
 import pageclass.DashboardPage;
 import pageclass.HomePage;
 import pageclass.LoginPage;
+import pageclass.RecurranceManagementPage;
 import pageclass.UploadActivityTemplatePage;
 import utility.DataReader;
 import utility.ExtentTestManager;
@@ -37,10 +38,11 @@ public class ConseroManagerTestScript extends BaseTest {
 	DashboardPage dashboardPageObj = null;
 	ActivityDetailsPage activityDetailsPageObj = null;
 	UploadActivityTemplatePage activityTemplatePageObj = null;
+	RecurranceManagementPage recurranceManagementPageObj = null;
 
 	String sheetName = "credentials";
 	String managerUsername = "", managerPassword = "", managerName = "";
-	String companyName = "Product Demo", username = "", nonCloseActivity ="", closeActivity= "" ;
+	String companyName = "Product Demo", nonCloseActivity ="", closeActivity= "", subActivity = "" ;
 	
 	@BeforeMethod(alwaysRun = true)
 	public void setUp(Method method) {
@@ -84,7 +86,7 @@ public class ConseroManagerTestScript extends BaseTest {
 	public void homePageTC() {
 		homePageObj = new HomePage(driver);
 		dashboardPageObj = new DashboardPage(driver);
-		
+		activityListPageObj = new ActivityListPage(driver);
 		try {
 			basePage.waitElementVisible(homePageObj.companyLogo, 60);
 			if(basePage.isElementPresent(homePageObj.companyLogo, 60)) {
@@ -93,9 +95,16 @@ public class ConseroManagerTestScript extends BaseTest {
 				test.log(LogStatus.FAIL, "Failed to load home page!!");
 			}
 			
-			Assert.assertTrue(homePageObj.isDashboardSelected());
-			test.log(LogStatus.INFO, "Dashboard tab is selected by default!!");
-			dashboardPageObj.getPageTitle();
+			homePageObj.selectEntity(companyName);
+			homePageObj.clickOnGo();
+			sleep();
+			homePageObj.clickOnControlDockInSimpl();
+			if(basePage.isElementPresent(activityListPageObj.pageTitle, 60)) {
+				test.log(LogStatus.PASS, "Redirected On Control Dock Page successfully!!!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to redirect On Control Dock Page!!!!");
+			}
+			sleep();
 			takeScreenshot();
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to load home page after login. " + ExceptionUtils.getStackTrace(e));
@@ -250,7 +259,7 @@ public class ConseroManagerTestScript extends BaseTest {
 			}
 			takeScreenshot();
 			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + activityListPageObj.getLastPageCount());
-		}catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -289,11 +298,11 @@ public class ConseroManagerTestScript extends BaseTest {
 					}
 					takeScreenshot();
 					addActivityPageObj.clickOnReviwerTab();
-					addActivityPageObj.setReviewerOneDetails(managerName, day, duration);
+//					addActivityPageObj.setReviewerOneDetails(managerName, day, duration);
 					addActivityPageObj.clickOnAddReviewerLink();
 					if(addActivityPageObj.isReviewerTwoLabelExist()) {
 						test.log(LogStatus.INFO, "reviewer two added successfully!!");
-						addActivityPageObj.setReviewerTwoDetails(managerName, day, duration);
+//						addActivityPageObj.setReviewerTwoDetails(managerName, day, duration);
 					}
 					addActivityPageObj.clickOnSubmit();
 					takeScreenshot();
@@ -387,26 +396,21 @@ public class ConseroManagerTestScript extends BaseTest {
 	public void activityDetailsTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		activityListPageObj = new ActivityListPage(driver);
-		String companyName = "", function = "", pageTitle = "", activity = "", status = "", assignedTo = "";
+		String company = "", function = "", pageTitle = "", activity = "", status = "", assignedTo = "";
 
 		try {
 			activityListPageObj.setSearch(closeActivity);
 			if (!basePage.isElementPresent(activityListPageObj.activityTable, 30)) {
-				companyName = activityListPageObj.getCompanyName();
+				company = activityListPageObj.getCompanyName();
 				function = activityListPageObj.getFunction();
 				activity = activityListPageObj.getActivityDetails();
-				pageTitle = companyName + " :: " + function;
+				pageTitle = company + " :: " + function;
 				status = activityListPageObj.getStatus();
 				assignedTo = activityListPageObj.getAssignedTo();
 
 				activityListPageObj.clickOnActivityDetails();
 				sleep();
-				if (activityDetailsPageObj.isPageTitleExist(pageTitle)) {
-					test.log(LogStatus.PASS, "Activity details Page opened successfully!!!!");
-				} else {
-					test.log(LogStatus.FAIL, "Failed to open Activity details Page!!!!");
-				}
-
+				Assert.assertTrue(activityDetailsPageObj.isPageTitleExist(pageTitle));
 				String activityName = activityDetailsPageObj.getActivityName(),
 						assignee = activityDetailsPageObj.getAssignToLevel();
 
@@ -454,8 +458,24 @@ public class ConseroManagerTestScript extends BaseTest {
 				test.log(LogStatus.INFO, "'start' button is displayed in 'activity details' Page for assigned status!!!!");
 				activityDetailsPageObj.clickOnStart();
 				sleep();
-				if(activityDetailsPageObj.getStatus().equals("In Progress")) {
-					test.log(LogStatus.PASS, "activity started sucessfully and status changed to 'In Progress'!!!!");
+				
+				if(activityDetailsPageObj.getStatus().equals("In Progress") && activityDetailsPageObj.isMarkAsCompleteButtonExist()) {
+					test.log(LogStatus.PASS, "activity started sucessfully, status changed to 'In Progress' and 'mark as complete' button exist!!!!");
+					takeScreenshot();
+					if(!activityDetailsPageObj.isAssignedToReviewer("Review 1")) {
+						activityDetailsPageObj.clickOnMarkAsComplete();
+						sleep();
+						Assert.assertEquals("Complete", activityDetailsPageObj.getStatus());
+						test.log(LogStatus.PASS, "activity completed sucessfully, status changed to 'Completed' ");
+						Assert.assertTrue(activityDetailsPageObj.isRecallButtonExist());
+						test.log(LogStatus.INFO, "'Recall' button exist!!!!");
+						takeScreenshot();
+						activityDetailsPageObj.clickOnRecall();
+						sleep();
+						Assert.assertEquals("In Progress", activityDetailsPageObj.getStatus());
+						test.log(LogStatus.PASS, "activity recalled sucessfully and status changed to 'In Progress' ");
+						takeScreenshot();
+					}
 				} else {
 					test.log(LogStatus.FAIL, "Failed to start activity!!!!");
 				}
@@ -530,23 +550,36 @@ public class ConseroManagerTestScript extends BaseTest {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		String modalTitle = "Upload",
 			   fileName = "",
-		       message = "File Uploaded Successfully";
+		       message = "File Uploaded Successfully",
+		       link = "https://" + generateRandomString(5),
+		       linkName = generateRandomString(5);
 		try {
-			activityDetailsPageObj.clickOnUploadDocument();
-			Assert.assertTrue(activityDetailsPageObj.isUploadModalExist(modalTitle));
-			activityDetailsPageObj.setDocument(fileName);
-			activityDetailsPageObj.clickOnUpload();
-			if(basePage.checkSuccessMessage(message)) {
-				test.log(LogStatus.INFO, "success message recieved- " + message);
+			for(int i=0; i<2; i++) {
+				activityDetailsPageObj.clickOnUploadDocument();
+				Assert.assertTrue(activityDetailsPageObj.isUploadModalExist(modalTitle));
+				if(i==0) {
+					activityDetailsPageObj.setDocument(fileName);
+				}
+				
+				if(i==1) {
+					activityDetailsPageObj.clickOnLink();
+					activityDetailsPageObj.setLinkDocument(link);
+					activityDetailsPageObj.setLinkName(linkName);
+				}
+				
+				activityDetailsPageObj.clickOnUpload();
+				if(basePage.checkSuccessMessage(message)) {
+					test.log(LogStatus.INFO, "success message recieved- " + message);
+				}
+				takeScreenshot();
+				sleep();
+				if(activityDetailsPageObj.isDocumentExist(fileName)) {
+					test.log(LogStatus.PASS, "Activity Document uploaed successfully!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to upload activity Document!!!!");
+				}
+				takeScreenshot();
 			}
-			takeScreenshot();
-			sleep();
-			if(activityDetailsPageObj.isDocumentExist(fileName)) {
-				test.log(LogStatus.PASS, "Activity Document uploaed successfully!!!!");
-			} else {
-				test.log(LogStatus.FAIL, "Failed to upload activity Document!!!!");
-			}
-			takeScreenshot();
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to upload activity note. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
@@ -556,6 +589,7 @@ public class ConseroManagerTestScript extends BaseTest {
 	@Test(priority=14)
 	public void deleteActivityDocumentTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		activityListPageObj = new ActivityListPage(driver);
 		String message = "Document deleted Successfully";
 		try {
 			String name = activityDetailsPageObj.getDocumentName();
@@ -569,6 +603,11 @@ public class ConseroManagerTestScript extends BaseTest {
 			} else {
 				test.log(LogStatus.FAIL, "Failed to delete activity Document!!!!");
 			}
+			takeScreenshot();
+			activityDetailsPageObj.clickOnBackToActivities();
+			sleep();
+			Assert.assertTrue(basePage.isElementPresent(activityListPageObj.pageTitle, 60));
+			test.log(LogStatus.INFO, "Redirected to Activity List page!!!!");
 			takeScreenshot();
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to delete activity note. " + ExceptionUtils.getStackTrace(e));
@@ -636,14 +675,125 @@ public class ConseroManagerTestScript extends BaseTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test(priority=17)
+	public void addSubActivityTC() {
+		activityListPageObj = new ActivityListPage(driver);
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		addActivityPageObj = new AddActivityPage(driver);
+		subActivity = "test_aubactivity_" + generateRandomString(3);
+		try {
+			activityListPageObj.setSearch(nonCloseActivity);
+			Assert.assertTrue(activityListPageObj.isActivitiesExist(nonCloseActivity));
+			String company = activityListPageObj.getCompanyName(),
+				   function = activityListPageObj.getFunction(),
+				   pageTitle = company + " :: " + function;
+			activityListPageObj.clickOnActivityDetails();
+			sleep();
+			Assert.assertTrue(activityDetailsPageObj.isPageTitleExist(pageTitle));
+			test.log(LogStatus.INFO, "Activity details Page opened successfully!!!!");
+			if(activityDetailsPageObj.checkSubActivityButtonExist()) {
+				test.log(LogStatus.INFO, "'Add SubActivity' and 'Convert to Sub Activity' button is present!!!!");
+				activityDetailsPageObj.clickOnAddSubactivity();
+				addActivityPageObj.setAddSubActivityDetails(subActivity);
+				sleep();
+				if(activityListPageObj.isTreeIconExist()) {
+					test.log(LogStatus.INFO, "tree icon exist for activity - " + nonCloseActivity);
+				}
+				takeScreenshot();
+				activityListPageObj.clickOnActivityDetails();
+				sleep();
+				if(activityDetailsPageObj.isSubActivityAdded(subActivity)) {
+					test.log(LogStatus.PASS, "SubActivity added successfully!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to add sub activity!!!!");
+				}
+				
+			} else {
+				test.log(LogStatus.INFO, "'Add SubActivity' and 'Convert to Sub Activity' button is not present.It should be available for non close activity!!!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to add sub activity. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=18)
+	public void attachSubActivityTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		try {
+			if(activityDetailsPageObj.isAttachSubActivityButtonExist()) {
+				test.log(LogStatus.INFO, "'Attach Sub Activity' button is exist!!!!");
+				activityDetailsPageObj.clickOnAttachSubactivity();
+				basePage.waitElementVisible(activityDetailsPageObj.attachSubactivitySection, 30);
+				activityDetailsPageObj.selectSubactivity();
+				activityDetailsPageObj.clickOnConfirmActivityChange();
+				takeScreenshot();
+				activityDetailsPageObj.clickOnBackToActivities();
+				sleep();
+				Assert.assertTrue(basePage.isElementPresent(activityListPageObj.pageTitle, 60));
+				test.log(LogStatus.INFO, "Redirected to Activity List page!!!!");
+			} else {
+				test.log(LogStatus.INFO, "'Attach Sub Activity' button doesn't exist!!!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=19)
 	public void verifyActivityTreeTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		try {
-			
+			activityListPageObj.setSearch(nonCloseActivity);
+			Assert.assertTrue(activityListPageObj.isActivitiesExist(nonCloseActivity));
+			if(activityListPageObj.isTreeIconExist()) {
+				test.log(LogStatus.INFO, "tree icon exist for activity - " + nonCloseActivity);
+				activityListPageObj.clickOnTreeIcon();
+				Thread.sleep(6000);
+				if(activityListPageObj.isActivityTreeModalExist()) {
+					activityListPageObj.setSearchActivityInTree(subActivity);
+					if(activityListPageObj.getSubActivity().equals(subActivity)) {
+						test.log(LogStatus.INFO, "subactivity exist in tree View !!!");
+					}
+				}
+			}
+			takeScreenshot();
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify activity tree. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=19)
+	public void downloadActivityTreeViewTC() {
+		activityListPageObj = new ActivityListPage(driver);
+		String filePath = "C:\\Users\\Admin\\Downloads",
+				csvFilename = "Tree View Structure.csv",
+				excelFileName = "Tree View Structure.xlsx";
+		try {
+			if(activityListPageObj.isActivityTreeModalExist()) {
+				activityListPageObj.clickOnExcelTreeView();
+				Thread.sleep(6000);
+				if(isFileDownloaded(filePath, excelFileName)) {
+					test.log(LogStatus.PASS, "EXCEL tree view File Downloaded SuccessFully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to Download EXCEL tree view File!!");
+				}
+				activityListPageObj.clickOnCsvTreeView();
+				Thread.sleep(6000);
+				if(isFileDownloaded(filePath, csvFilename)) {
+					test.log(LogStatus.PASS, "CSV tree view File Downloaded SuccessFully!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to Download CSV tree view File!!");
+				}
+				activityListPageObj.clickOnBtnBackToActivity();
+			}
+			takeScreenshot();
+		}catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to download activity tree view. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
@@ -659,6 +809,7 @@ public class ConseroManagerTestScript extends BaseTest {
 			homePageObj.moveToControlDock();
 			homePageObj.selectControldockSubmennu(submenu);
 			Assert.assertTrue(basePage.isElementPresent(activityListPageObj.pageTitle, 60));
+			test.log(LogStatus.INFO, submenu + " Page opened sucessfully!!");
 			activityTemplatePageObj.setTemplateDetails(name, filePath);
 			activityTemplatePageObj.clickOnValidateTemplate();
 			if(activityTemplatePageObj.isErrorDivExist()) {
@@ -675,7 +826,13 @@ public class ConseroManagerTestScript extends BaseTest {
 	@Test(priority=19)
 	public void recurranceManagementTC() {
 		homePageObj = new HomePage(driver);
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		String submenu = "Recurrence Management";
 		try {
+			homePageObj.moveToControlDock();
+			homePageObj.selectControldockSubmennu(submenu);
+			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
+			test.log(LogStatus.INFO, submenu + " Page opened sucessfully!!");
 			
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify recuurence management. " + ExceptionUtils.getStackTrace(e));
