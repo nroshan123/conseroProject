@@ -204,7 +204,7 @@ public class BaseTest {
 	}
 	
 	public String addDayToCurrentDate(int day) {
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		DateFormat dateFormat = new SimpleDateFormat("MM/d/yyyy");
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.add(Calendar.DATE, day);

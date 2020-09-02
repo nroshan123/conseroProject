@@ -28,6 +28,9 @@ public class BasePage {
   	@FindBy(xpath = "//div[contains(@class,'dataTables_paginate')]//a[contains(@class,'paginate_button') and not(contains(@class,'disabled'))]")
   	public List<WebElement> pagination;
   	
+  	@FindBy(id = "activitiesTable_paginate")
+  	WebElement paginatePanel;
+  	
   	@FindBy(xpath = "//div[contains(@class,'dataTables_paginate')]//a[text()='Previous']")
   	public WebElement previousButton;
   	
@@ -126,12 +129,11 @@ public class BasePage {
 	//pagination function
 	
 	public void clickOnPagination() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", paginatePanel);
 		try {
 			for (int i = 0; i < pagination.size(); i++) {
-				if (!pagination.get(i).getAttribute("class").contains("disabled")) {
-					((JavascriptExecutor) driver).executeScript("arguments[0].click();", pagination.get(i));
-					Thread.sleep(2000);
-				}
+				((JavascriptExecutor) driver).executeScript("arguments[0].click();", pagination.get(i));
+				Thread.sleep(2000);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

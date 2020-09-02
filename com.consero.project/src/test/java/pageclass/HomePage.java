@@ -17,8 +17,11 @@ public class HomePage extends BasePage {
 	@FindBy(xpath = "//img[@class='company_logo']")
 	public WebElement companyLogo;
 	
-	@FindBy(id = "SelectedCompany")
+	@FindBy(id = "SelectedCompany_chosen")
 	WebElement entityDropdown;
+
+	@FindBy(xpath = "//ul[@class='chosen-results']//li")
+	List<WebElement> entityOption;
 	
 	@FindBy(id = "changeCompDashSideBar")
 	WebElement go;
@@ -44,6 +47,12 @@ public class HomePage extends BasePage {
 	@FindBy(xpath = "//li[@id='Activities']//ul[contains(@class,'sub-menu')]//li//a")
 	List<WebElement> controldockSubmenu;
 	
+	@FindBy(xpath = "//li[@id='Activities']//ul[contains(@class,'sub-menu')]//li//a[text()='Add Activity']")
+	WebElement addActivity;
+	
+	@FindBy(xpath = "//li[@id='Activities']//ul[contains(@class,'sub-menu')]//li//a[text()='Upload Recurring Activity Template']")
+	WebElement recurringActivityTemplate;
+	
 	@FindBy(id = "header_profile_bar")
 	WebElement profileBar;
 	
@@ -62,9 +71,17 @@ public class HomePage extends BasePage {
 		PageFactory.initElements(driver, this);
 	}
 	
+	public void clickOnEntityDropdown() {
+		entityDropdown.click();
+	}
+	
 	public void selectEntity(String value) {
-		Select select = new Select(entityDropdown);
-		select.selectByVisibleText(value);
+		for(WebElement entity:entityOption) {
+			if(entity.getText().equals(value)) {
+				entity.click();
+				break;
+			}
+		}
 	}
 	
 	public void clickOnGo() {
@@ -149,14 +166,26 @@ public class HomePage extends BasePage {
 	
 	public void selectControldockSubmennu(String name) {
 		for(WebElement submenu:controldockSubmenu) {
+			System.out.println(submenu.getText());
+			System.out.println(name);
 			if(submenu.getText().equals(name)) {
+				System.out.println("equal");
 				((JavascriptExecutor) driver).executeScript("arguments[0].click()", submenu);
 				break;
 			}
 		}
 	}
 	
+	public void clickOnAddActivity() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", addActivity);
+	}
+	
 	public void clickOnControlDockInSimpl() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", controlDockInSimpl);
 	}
+	
+	public void clickOnRecurringActivityTemplate() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", recurringActivityTemplate);
+	}
+	
 }

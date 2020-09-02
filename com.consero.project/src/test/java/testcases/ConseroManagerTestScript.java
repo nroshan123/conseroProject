@@ -42,7 +42,7 @@ public class ConseroManagerTestScript extends BaseTest {
 
 	String sheetName = "credentials";
 	String managerUsername = "", managerPassword = "", managerName = "";
-	String companyName = "Product Demo", nonCloseActivity ="", closeActivity= "", subActivity = "" ;
+	String companyName = "Product Demo", nonCloseActivity ="test_nonclose_activity_ZGdUd", closeActivity= "test_close_activity_EgdYG", subActivity = "" ;
 	
 	@BeforeMethod(alwaysRun = true)
 	public void setUp(Method method) {
@@ -88,13 +88,13 @@ public class ConseroManagerTestScript extends BaseTest {
 		dashboardPageObj = new DashboardPage(driver);
 		activityListPageObj = new ActivityListPage(driver);
 		try {
-			basePage.waitElementVisible(homePageObj.companyLogo, 60);
 			if(basePage.isElementPresent(homePageObj.companyLogo, 60)) {
 				test.log(LogStatus.PASS, "Home page loaded successfully!!");
 			} else {
 				test.log(LogStatus.FAIL, "Failed to load home page!!");
 			}
-			
+			sleep();
+			homePageObj.clickOnEntityDropdown();
 			homePageObj.selectEntity(companyName);
 			homePageObj.clickOnGo();
 			sleep();
@@ -117,13 +117,17 @@ public class ConseroManagerTestScript extends BaseTest {
 		homePageObj = new HomePage(driver);
 		activityListPageObj = new ActivityListPage(driver);
 		try {
-			homePageObj.clickOnControlDock();
 			Assert.assertTrue(basePage.isElementPresent(activityListPageObj.pageTitle, 60));
 			test.log(LogStatus.INFO, "Activity list page opened sucessfully!!");
 			sleep();
 			if(activityListPageObj.isActivitiesHeadertableVisible()) {
 				test.log(LogStatus.INFO, "All Filters Are visible in Activity list page!!");
 			}
+			
+			if(activityListPageObj.getAssignee().equals(managerName)) {
+				test.log(LogStatus.INFO, "assignee name is same as logged in user name!!");
+			}
+			
 			activityListPageObj.clickOnBtnActivityheader();
 			if(!activityListPageObj.isActivitiesHeadertableVisible()) {
 				test.log(LogStatus.PASS, "All Filters Are hidden after click on 'Collapse' button!!");
@@ -277,18 +281,21 @@ public class ConseroManagerTestScript extends BaseTest {
 			   checklist2 = generateRandomString(5),
 			   duration = generateNumberExceptZero(10),
 			   activityType = "CloseActivity";
-			   
+			   System.out.println("sfjhsd");
+
+		int dueForClient = Integer.parseInt(day) + 1;
+		String dueForClientBizDay = String.valueOf(dueForClient);
 		try {
 			sleep();
 			homePageObj.moveToControlDock();
 			homePageObj.selectControldockSubmennu(submenu);
-			
+			 System.out.println("fsdfsd");
 			if(addActivityPageObj.isactivityModalExist()) {
 				try {
 					sleep();
 					addActivityPageObj.selectCompany(companyName);
 					addActivityPageObj.selectActivityType(activityType);
-					addActivityPageObj.setActivityDetails(closeActivity, day, managerName );
+					addActivityPageObj.setActivityDetails(closeActivity, day, dueForClientBizDay, managerName );
 					addActivityPageObj.clickOnChecklistTab();
 					addActivityPageObj.setCheckListItemOne(checkList1);
 					addActivityPageObj.clickOnChecklistLink();
@@ -297,18 +304,19 @@ public class ConseroManagerTestScript extends BaseTest {
 						addActivityPageObj.setCheckListItemTwo(checklist2);
 					}
 					takeScreenshot();
-					addActivityPageObj.clickOnReviwerTab();
+//					addActivityPageObj.clickOnReviwerTab();
 //					addActivityPageObj.setReviewerOneDetails(managerName, day, duration);
-					addActivityPageObj.clickOnAddReviewerLink();
-					if(addActivityPageObj.isReviewerTwoLabelExist()) {
-						test.log(LogStatus.INFO, "reviewer two added successfully!!");
+//					addActivityPageObj.clickOnAddReviewerLink();
+//					if(addActivityPageObj.isReviewerTwoLabelExist()) {
+//						test.log(LogStatus.INFO, "reviewer two added successfully!!");
 //						addActivityPageObj.setReviewerTwoDetails(managerName, day, duration);
-					}
+//					}
 					addActivityPageObj.clickOnSubmit();
 					takeScreenshot();
 					if(basePage.isElementPresent(activityListPageObj.pageTitle, 60)) {
 						test.log(LogStatus.INFO, "Redirected On Activity list Page successfully!!!!");
 					} 
+					sleep();
 					activityListPageObj.setSearch(closeActivity);
 					if(basePage.isElementPresent(activityListPageObj.activityTable, 30)) {
 						test.log(LogStatus.INFO, "No Activity list found.");
@@ -320,7 +328,8 @@ public class ConseroManagerTestScript extends BaseTest {
 						}
 					}
 				} catch(Exception e) {
-					addActivityPageObj.clickOnCancelAddActivity();
+					e.printStackTrace();
+//					addActivityPageObj.clickOnCancelAddActivity();
 				}
 			}
 			takeScreenshot();
@@ -343,7 +352,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		       day = getdayFromDateFormat(date);
 		try {
 			homePageObj.moveToControlDock();
-			homePageObj.selectControldockSubmennu(submenu);
+			homePageObj.clickOnAddActivity();
 			
 			if(addActivityPageObj.isactivityModalExist()) {
 				try {
@@ -358,11 +367,12 @@ public class ConseroManagerTestScript extends BaseTest {
 					if(addActivityPageObj.isRelaventChildActivities()) {
 						test.log(LogStatus.INFO, "sub activities field is exist!!!!");
 					}
-					addActivityPageObj.clickOnIsSubActivity();
-					addActivityPageObj.clickOnValidateDueDate();
-					if(addActivityPageObj.isRelaventParentActivity()) {
-						test.log(LogStatus.INFO, "parent activities field is exist!!!!");
-					}
+//					addActivityPageObj.clickOnIsSubActivity();
+//					addActivityPageObj.clickOnValidateDueDate();
+//					if(addActivityPageObj.isRelaventParentActivity()) {
+//						test.log(LogStatus.INFO, "parent activities field is exist!!!!");
+//					}
+//					addActivityPageObj.clickOnIsSubActivity();
 					addActivityPageObj.clickOnActivityTab();
 					addActivityPageObj.setNonCloseActivityDetails(nonCloseActivity, day, managerName);
 					 takeScreenshot();
@@ -374,6 +384,7 @@ public class ConseroManagerTestScript extends BaseTest {
 				if(basePage.isElementPresent(activityListPageObj.pageTitle, 60)) {
 					test.log(LogStatus.PASS, "Redirected On Activity list Page successfully!!!!");
 				} 
+				sleep();
 				activityListPageObj.setSearch(nonCloseActivity);
 				if(basePage.isElementPresent(activityListPageObj.activityTable, 30)) {
 					test.log(LogStatus.INFO, "No Activity list found.");
@@ -400,14 +411,17 @@ public class ConseroManagerTestScript extends BaseTest {
 
 		try {
 			activityListPageObj.setSearch(closeActivity);
-			if (!basePage.isElementPresent(activityListPageObj.activityTable, 30)) {
+			Thread.sleep(6000);
+			if (activityListPageObj.isActivitiesExist(closeActivity)) {
 				company = activityListPageObj.getCompanyName();
 				function = activityListPageObj.getFunction();
 				activity = activityListPageObj.getActivityDetails();
 				pageTitle = company + " :: " + function;
 				status = activityListPageObj.getStatus();
 				assignedTo = activityListPageObj.getAssignedTo();
-
+				sleep();
+				System.out.println("bdhga");
+				System.out.println(pageTitle);
 				activityListPageObj.clickOnActivityDetails();
 				sleep();
 				Assert.assertTrue(activityDetailsPageObj.isPageTitleExist(pageTitle));
@@ -489,7 +503,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=11)
+	@Test(priority=12)
 	public void addActivityNoteTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		String note = generateRandomString(5),
@@ -517,7 +531,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=12)
+	@Test(priority=13)
 	public void editActivityNoteTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		String note = generateRandomString(6),
@@ -545,11 +559,11 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=13)
+	@Test(priority=14)
 	public void uploadActivityDocumentTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		String modalTitle = "Upload",
-			   fileName = "",
+			   fileName = "C:\\Users\\Admin\\conseroFiles\\sample.pdf",
 		       message = "File Uploaded Successfully",
 		       link = "https://" + generateRandomString(5),
 		       linkName = generateRandomString(5);
@@ -586,7 +600,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=14)
+	@Test(priority=15)
 	public void deleteActivityDocumentTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		activityListPageObj = new ActivityListPage(driver);
@@ -615,39 +629,41 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=15)
+	@Test(priority = 16)
 	public void verifyActivityNoteTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		try {
 			activityListPageObj.setSearch(closeActivity);
-			Assert.assertTrue(activityListPageObj.isActivitiesExist(closeActivity));
-			if(activityListPageObj.isNoteButtonExist()) {
-				test.log(LogStatus.INFO, "Activity Note button is visible!!!!");
-				activityListPageObj.clickOnNoteButton();
-				if(activityListPageObj.isNoteContainerExist()) {
-					test.log(LogStatus.PASS, "Note is visible on click of note button!!!!");
-					takeScreenshot();
-					sleep();
+			sleep();
+			if (!basePage.isElementPresent(activityListPageObj.activityTable, 30)) {
+				if (activityListPageObj.isNoteButtonExist()) {
+					test.log(LogStatus.INFO, "Activity Note button is visible!!!!");
 					activityListPageObj.clickOnNoteButton();
-					if(!activityListPageObj.isNoteContainerExist()) {
-						test.log(LogStatus.PASS, "Note is hidden on click of note button!!!!");
+					if (activityListPageObj.isNoteContainerExist()) {
+						test.log(LogStatus.PASS, "Note is visible on click of note button!!!!");
+						takeScreenshot();
+						sleep();
+						activityListPageObj.clickOnNoteButton();
+						if (!activityListPageObj.isNoteContainerExist()) {
+							test.log(LogStatus.PASS, "Note is hidden on click of note button!!!!");
+						} else {
+							test.log(LogStatus.FAIL, "Note is  not hidden on click of note button!!!!");
+						}
 					} else {
-						test.log(LogStatus.FAIL, "Note is  not hidden on click of note button!!!!");
+						test.log(LogStatus.FAIL, "Note is  not visible on click of note button!!!!");
 					}
 				} else {
-					test.log(LogStatus.FAIL, "Note is  not visible on click of note button!!!!");
+					test.log(LogStatus.INFO, "Activity Note button should be visible for activity - " + closeActivity);
 				}
-			} else {
-				test.log(LogStatus.INFO, "Activity Note button should be visible for activity - " + closeActivity );
 			}
 			takeScreenshot();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify activity note. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	@Test(priority=16)
+	@Test(priority=17)
 	public void editActivityTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		addActivityPageObj = new AddActivityPage(driver);
@@ -658,16 +674,17 @@ public class ConseroManagerTestScript extends BaseTest {
 			if(!basePage.isElementPresent(activityListPageObj.activityTable, 30)) {
 				activityListPageObj.clickOnEdit();
 				Assert.assertTrue(addActivityPageObj.isactivityModalExist());
-				addActivityPageObj.setActivityDescritption(description);
-				addActivityPageObj.confirmEditModal(content);
+				sleep();
+				addActivityPageObj.setEditActivityDetails(description, content);
 				sleep();
 				if(activityListPageObj.isActivitiesExist(description)) {
 					test.log(LogStatus.PASS, "Activity updated successfully!!!!");
+					closeActivity = description;
 				} else {
 					test.log(LogStatus.PASS, "Failed to update activity!!!!");
 				}
 			} else {
-				test.log(LogStatus.INFO, "No Activity found.");
+				test.log(LogStatus.FAIL, "No Activity found.");
 			}
 			takeScreenshot();
 		} catch(Exception e) {
@@ -676,7 +693,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 
-	@Test(priority=17)
+	@Test(priority=18)
 	public void addSubActivityTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
@@ -684,7 +701,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		subActivity = "test_aubactivity_" + generateRandomString(3);
 		try {
 			activityListPageObj.setSearch(nonCloseActivity);
-			Assert.assertTrue(activityListPageObj.isActivitiesExist(nonCloseActivity));
+			Assert.assertFalse(basePage.isElementPresent(activityListPageObj.activityTable, 40));
 			String company = activityListPageObj.getCompanyName(),
 				   function = activityListPageObj.getFunction(),
 				   pageTitle = company + " :: " + function;
@@ -719,7 +736,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=18)
+	@Test(priority=19)
 	public void attachSubActivityTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		try {
@@ -743,7 +760,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=19)
+	@Test(priority=20)
 	public void verifyActivityTreeTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		try {
@@ -767,7 +784,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=19)
+	@Test(priority=21)
 	public void downloadActivityTreeViewTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		String filePath = "C:\\Users\\Admin\\Downloads",
@@ -798,7 +815,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=18)
+	@Test(priority=22)
 	public void uploadActivityTemplateTC() {
 		homePageObj = new HomePage(driver);
 		activityTemplatePageObj = new UploadActivityTemplatePage(driver);
@@ -807,8 +824,8 @@ public class ConseroManagerTestScript extends BaseTest {
 			   filePath = "C:\\Users\\Admin\\conseroFiles\\ODM_Template_Sample.csv";
 		try {
 			homePageObj.moveToControlDock();
-			homePageObj.selectControldockSubmennu(submenu);
-			Assert.assertTrue(basePage.isElementPresent(activityListPageObj.pageTitle, 60));
+			homePageObj.clickOnRecurringActivityTemplate();
+			Assert.assertTrue(basePage.isElementPresent(activityTemplatePageObj.pageTitle, 60));
 			test.log(LogStatus.INFO, submenu + " Page opened sucessfully!!");
 			activityTemplatePageObj.setTemplateDetails(name, filePath);
 			activityTemplatePageObj.clickOnValidateTemplate();
@@ -823,7 +840,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=19)
+	@Test(priority=22)
 	public void recurranceManagementTC() {
 		homePageObj = new HomePage(driver);
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);

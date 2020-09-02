@@ -38,7 +38,7 @@ public class AddActivityPage extends BasePage {
 	@FindBy(id = "StartOnBizDay")
 	WebElement startOnBizDay;
 	
-	@FindBy(id = "DueForClientBizDay")
+	@FindBy(xpath = "//input[@id='DueForClientBizDay']")
 	WebElement dueForClientBizDay;
 	
 	@FindBy(id = "Owner")
@@ -138,6 +138,9 @@ public class AddActivityPage extends BasePage {
 	@FindBy(id = "EditActivityConfirm")
 	WebElement editActivityConfirm;
 	
+	@FindBy(id = "EditActivity")
+	WebElement editActivity;
+	
 	@FindBy(xpath = "//div[@id='EditActivityConfirm']//h4")
 	WebElement editModalContent;
 	
@@ -187,7 +190,7 @@ public class AddActivityPage extends BasePage {
 	}
 	
 	public String getActivityDescription() {
-		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",activityDescription).toString(); 
+		return activityDescription.getText(); 
 	}
 	
 	public void setActivityDescritption(String description) {
@@ -221,7 +224,7 @@ public class AddActivityPage extends BasePage {
 	}
 	
 	public String getDueForClientBizDay() {
-		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",dueForClientBizDay).toString();
+		return dueForClientBizDay.getAttribute("value");
 	}
 	
 	public void setStartOnBizDay(String day) {
@@ -232,9 +235,7 @@ public class AddActivityPage extends BasePage {
 	}
 	
 	public void setDueForClientBizDay(String day) {
-		if(!Strings.isNullOrEmpty(this.getDueForClientBizDay())) {
-			dueForClientBizDay.clear();
-		}
+		dueForClientBizDay.clear();
 		dueForClientBizDay.sendKeys(day);
 	}
 	
@@ -314,7 +315,7 @@ public class AddActivityPage extends BasePage {
 	}
 	
 	public void clickOnSubmit() {
-		submit.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", submit);
 	}
 	
 	public void clickOnCancelAddActivity() {
@@ -322,15 +323,16 @@ public class AddActivityPage extends BasePage {
 	}
 	
 	public void clickOnChecklistLink() {
-		checklistLink.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", checklistLink);
 	}
 	
-	public void setActivityDetails(String description, String day, String owner) {
+	public void setActivityDetails(String description, String day, String dueForClientBizDay,String owner) {
+		
 		this.setActivityDescritption(description);
 		this.selectFunction();
 		this.selectTower();
-		this.setStartOnBizDay(day);
-		this.setDueForClientBizDay(day);
+    	this.setStartOnBizDay(day);
+		this.setDueForClientBizDay(dueForClientBizDay);
 		this.selectOwner(owner);
 	}
 	
@@ -339,7 +341,7 @@ public class AddActivityPage extends BasePage {
 	}
 	
 	public void clickOnAddReviewerLink() {
-		addReviewerLink.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", addReviewerLink);
 	}
 	
 	public boolean isReviewerTwoLabelExist() {
@@ -403,6 +405,10 @@ public class AddActivityPage extends BasePage {
 		return isElementPresent(editActivityConfirm,30);
 	}
 	
+	public void clickOnEditActivity() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", editActivity);
+	}
+	
 	public String getEditModalContent() {
 		return editModalContent.getText().trim();
 	}
@@ -423,6 +429,19 @@ public class AddActivityPage extends BasePage {
 	
 	public void clickOnCancelEditActivity() {
 		cancelEditActivity.click();
+	}
+	
+	public void setEditActivityDetails(String description, String content) {
+		if(this.isactivityModalExist()) {
+			try {
+				this.setActivityDescritption(description);
+				this.clickOnEditActivity();
+				this.confirmEditModal(content);
+				this.waitUntilElementInvisible("//div[contains(@class,'addActivityDialogue')]", 30);
+			} catch(Exception e) {
+				this.clickOnCancelEditActivity();
+			}
+		}
 	}
 	
 	public void setAddSubActivityDetails(String description) {

@@ -39,6 +39,9 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td[@class='dataTables_empty']")
 	public WebElement activityTable;
 	
+	@FindBy(xpath = "//table[@id='activitiesheadertable']//td[@class='activitySelectedAssignedTo']//span[@class='multiselect-selected-text']")
+	WebElement assignee;
+	
 	@FindBy(id = "selectedActivityType")
 	WebElement activityTypeDropdown;
 	
@@ -75,7 +78,7 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr[1]//td[5]")
 	WebElement status;
 	
-	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td//button[contains(@class,'hasNotesButton')]")
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td//button[contains(@class,'hasNotesButton')]/i[@title='Notes']")
 	WebElement noteButton;
 	
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//div[contains(@class,'note-shadow')]")
@@ -122,6 +125,10 @@ public class ActivityListPage extends BasePage{
 	
 	public void clickOnEdit() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", edit);
+	}
+	
+	public String getAssignee() {
+		return assignee.getText();
 	}
 	
 	public void selectActivityType(String value) {
@@ -237,7 +244,7 @@ public class ActivityListPage extends BasePage{
 	}
 	
 	public void clickOnNoteButton() {
-		noteButton.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", noteButton);
 	}
 	
 	public boolean isNoteContainerExist() {
