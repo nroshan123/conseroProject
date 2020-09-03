@@ -1,5 +1,7 @@
 package pageclass;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -143,12 +145,18 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(xpath = "//div[@id='ChildActivities']//table//tbody//tr//td[1]")
 	List<WebElement> subActivityNames;
 	
-	@FindBy(id = "RelavantSubActivitiesSection")
+	@FindBy(id = "SubActivitiesAction")
 	public WebElement attachSubactivitySection;
 	
-	@FindBy(id = "RelavantSubActivitiesToAttach")
+	@FindBy(id = "RelavantSubActivitiesSection")
 	WebElement subactivityDropdown;
 	
+	@FindBy(xpath = "//div[@id='RelavantSubActivitiesSection']//ul//li//label[@class='checkbox']")
+	List<WebElement> subactivityOption;
+	
+	@FindBy(xpath = "//div[@id='RelavantSubActivitiesSection']//button")
+	WebElement selectedSubactivity;
+
 	@FindBy(id = "ConfirmActivityChange")
 	WebElement confirmActivityChange;
 	
@@ -383,11 +391,41 @@ public class ActivityDetailsPage extends BasePage {
 		return false;
 	}
 	
+	public void clickOnSubactivityDropdown() {
+		subactivityDropdown.click();
+		
+	}
+	
 	public void selectSubactivity() {
-		Select select = new Select(subactivityDropdown);
-		for(int i=0;i<3; i++) {
-			select.selectByIndex(i);
+		for(int i=1;i<subactivityOption.size(); i++) {
+			if(i==1||i==2||i==3) {
+				((JavascriptExecutor) driver).executeScript("arguments[0].click()", subactivityOption.get(i));
+			} else {
+				break;
+			}
 		}
+	}
+	
+	public String getSelectedSubactivity() {
+		return selectedSubactivity.getAttribute("title");
+	}
+	
+	public boolean isSubactivityAttached(String subactivity) {
+		String[] subactivities = subactivity.split(", ");
+		List<String> selectedSubactivity = Arrays.asList(subactivities);
+		String[]  subactivityInList= new String[subActivityNames.size()];
+		for(int i=0; i<subActivityNames.size(); i++) {
+			subactivityInList[i] = subActivityNames.get(i).getText();
+		}
+		
+		if(Arrays.asList(subactivityInList).containsAll(selectedSubactivity)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void scrollToChildActivitiesTable() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", childActivitiesTabel);
 	}
 	
 	public boolean isAttachSubActivityButtonExist() {

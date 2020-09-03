@@ -447,11 +447,13 @@ public class AddActivityPage extends BasePage {
 	public void setAddSubActivityDetails(String description) {
 		if (this.isactivityModalExist()) {
 			try {
-				this.setActivityDescritption(description);
+				Thread.sleep(1000);
+				activityDescription.sendKeys(description);
 				this.clickOnAddSubActivity();
 				this.waitUntilElementInvisible("//div[contains(@class,'addActivityDialogue')]", 30);
 			} catch (Exception e) {
 				this.clickOnCancelEditActivity();
+				e.printStackTrace();
 			}
 		}
 	}

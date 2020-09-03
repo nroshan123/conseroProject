@@ -9,7 +9,7 @@ public class UploadActivityTemplatePage extends BasePage {
 	
 	WebDriver driver;
 	
-	@FindBy(id = "TemplateFile")
+	@FindBy(id = "TemplateName")
 	WebElement templateName;
 
 	@FindBy(xpath = "//*[@class='page-title' and contains(text() , 'Upload Recurrence Activity Template')]")

@@ -619,7 +619,6 @@ public class ConseroManagerTestScript extends BaseTest {
 			}
 			takeScreenshot();
 			activityDetailsPageObj.clickOnBackToActivities();
-			sleep();
 			Assert.assertTrue(basePage.isElementPresent(activityListPageObj.pageTitle, 60));
 			test.log(LogStatus.INFO, "Redirected to Activity List page!!!!");
 			takeScreenshot();
@@ -701,7 +700,7 @@ public class ConseroManagerTestScript extends BaseTest {
 		subActivity = "test_aubactivity_" + generateRandomString(3);
 		try {
 			activityListPageObj.setSearch(nonCloseActivity);
-			Assert.assertFalse(basePage.isElementPresent(activityListPageObj.activityTable, 40));
+			Assert.assertFalse(basePage.isElementPresent(activityListPageObj.activityTable, 20));
 			String company = activityListPageObj.getCompanyName(),
 				   function = activityListPageObj.getFunction(),
 				   pageTitle = company + " :: " + function;
@@ -744,8 +743,16 @@ public class ConseroManagerTestScript extends BaseTest {
 				test.log(LogStatus.INFO, "'Attach Sub Activity' button is exist!!!!");
 				activityDetailsPageObj.clickOnAttachSubactivity();
 				basePage.waitElementVisible(activityDetailsPageObj.attachSubactivitySection, 30);
+				activityDetailsPageObj.clickOnSubactivityDropdown();
 				activityDetailsPageObj.selectSubactivity();
+				String subActivity = activityDetailsPageObj.getSelectedSubactivity();
 				activityDetailsPageObj.clickOnConfirmActivityChange();
+				
+				if(activityDetailsPageObj.isSubactivityAttached(subActivity)) {
+					test.log(LogStatus.PASS, "Subactivity attached successfully!!!! " + subActivity);
+				} else {
+					test.log(LogStatus.FAIL, "Fialed to attach Subactivity!!!!");
+				}
 				takeScreenshot();
 				activityDetailsPageObj.clickOnBackToActivities();
 				sleep();
@@ -764,13 +771,14 @@ public class ConseroManagerTestScript extends BaseTest {
 	public void verifyActivityTreeTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		try {
-			activityListPageObj.setSearch(nonCloseActivity);
+			sleep();
 			Assert.assertTrue(activityListPageObj.isActivitiesExist(nonCloseActivity));
 			if(activityListPageObj.isTreeIconExist()) {
 				test.log(LogStatus.INFO, "tree icon exist for activity - " + nonCloseActivity);
 				activityListPageObj.clickOnTreeIcon();
 				Thread.sleep(6000);
 				if(activityListPageObj.isActivityTreeModalExist()) {
+					basePage.waitElementVisible(activityListPageObj.searchActivityInTree, 80);
 					activityListPageObj.setSearchActivityInTree(subActivity);
 					if(activityListPageObj.getSubActivity().equals(subActivity)) {
 						test.log(LogStatus.INFO, "subactivity exist in tree View !!!");
@@ -785,7 +793,7 @@ public class ConseroManagerTestScript extends BaseTest {
 	}
 	
 	@Test(priority=21)
-	public void downloadActivityTreeViewTC() {
+	public void exportActivityTreeViewTC() {
 		activityListPageObj = new ActivityListPage(driver);
 		String filePath = "C:\\Users\\Admin\\Downloads",
 				csvFilename = "Tree View Structure.csv",
@@ -840,12 +848,13 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=22)
+	@Test(priority=23)
 	public void recurranceManagementTC() {
 		homePageObj = new HomePage(driver);
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);
 		String submenu = "Recurrence Management";
 		try {
+			sleep();
 			homePageObj.moveToControlDock();
 			homePageObj.selectControldockSubmennu(submenu);
 			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
@@ -853,6 +862,166 @@ public class ConseroManagerTestScript extends BaseTest {
 			
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify recuurence management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=24)
+	public void recurranceManagementPaginationTC() {
+		homePageObj = new HomePage(driver);
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		try {
+			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
+			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 30)) {
+				test.log(LogStatus.INFO, "No reccrances found.");
+			}
+			
+			if(basePage.pagination.size()>0) {
+				test.log(LogStatus.INFO, "Pagination Found.");
+				basePage.clickOnPagination();
+			} else {
+				test.log(LogStatus.INFO, "Pagination Not Found.");
+			}
+			takeScreenshot();
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=25)
+	public void verifyRecurrancePreviousAndNextPageTC() {
+		try {
+			this.prevoiusAndNextPagination();
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to verify previous and next pagination in Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=26)
+	public void verifyRecurranceFirstAndLastPageTC() {
+		try {
+			this.firstAndLastPagination();
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to verify first and last pagination in Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=27)
+	public void showRecurranceEntriesTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		int entries = 0;
+		String selectedEntries = "";
+		try {
+			Thread.sleep(5000);
+			selectedEntries = recurranceManagementPageObj.getSelectedEntries();
+			String pageCount = recurranceManagementPageObj.getLastPageCount();
+			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + pageCount);
+			recurranceManagementPageObj.selectShowEntries();
+			sleep();
+			try {
+				entries = Integer.parseInt(recurranceManagementPageObj.getSelectedEntries());
+			} catch(NumberFormatException nfe) {
+				System.out.println("NumberFormatException: " + nfe.getMessage());
+			}
+			System.out.println(entries);
+			
+			int count = recurranceManagementPageObj.getRecurranceCount();
+			System.out.println(count);
+			if(entries == count) {
+				test.log(LogStatus.PASS, "Recurrance count is equal to selected entries.");
+			} else {
+				test.log(LogStatus.FAIL, "Recurrance count is not equal to selected entries.");
+			}
+			takeScreenshot();
+			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + recurranceManagementPageObj.getLastPageCount());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=28)
+	public void exportRecurrancesTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		String csvFileName = "Recurrence details.csv",
+			   excelFileName = "Recurrence details.xlsx",
+			   filePath = "C:\\Users\\Admin\\Downloads";
+		try {
+			recurranceManagementPageObj.clickOnExcel();
+			Thread.sleep(4000);
+			if(isFileDownloaded(filePath, excelFileName)) {
+				test.log(LogStatus.PASS, "EXCEL Reccurance File Downloaded SuccessFully!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to Download EXCEL Reccurance File!!");
+			}
+			recurranceManagementPageObj.clickOnCsv();
+			Thread.sleep(4000);
+			if(isFileDownloaded(filePath, csvFileName)) {
+				test.log(LogStatus.PASS, "CSV Reccurance File Downloaded SuccessFully!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to Download CSV Reccurance File!!");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 29)
+	public void sortingReccuranceByActivityNameTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		try {
+			recurranceManagementPageObj.clickOnActivityName();
+			if (recurranceManagementPageObj.isFieldNameAscendingOrder()) {
+				test.log(LogStatus.PASS, "Activity Name sorted in ascending order!!!!");
+				takeScreenshot();
+				recurranceManagementPageObj.clickOnActivityName();
+				if (recurranceManagementPageObj.isFieldNameDescendingOrder()) {
+					test.log(LogStatus.PASS, "'Activity Name' sorted in descending order!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to sort 'Activity Name' in descending order!!!!");
+				}
+			} else {
+				test.log(LogStatus.FAIL, "Failed to sort 'Activity Name' in ascending order!!!!");
+			}
+			takeScreenshot();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//@Test(priority = 30)
+	public void viewRecurranceTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		try {
+			
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to view Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	//@Test(priority = 31)
+	public void editReccuranceTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		try {
+			
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to edit Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	//@Test(priority = 32)
+	public void endReccuranceTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		try {
+			
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to end Recurrance Management. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}

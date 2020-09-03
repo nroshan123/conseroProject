@@ -91,7 +91,7 @@ public class ActivityListPage extends BasePage{
 	WebElement activityTreeModal;
 	
 	@FindBy(xpath = "//div[@id='treeViewStructureTable_filter']//input[@type='search']")
-	WebElement searchActivityInTree;
+	public WebElement searchActivityInTree;
 	
 	@FindBy(xpath = "//table[@id='treeViewStructureTable']//tbody//tr[1]//td[2]//a")
 	WebElement subActivity;
