@@ -28,8 +28,8 @@ public class BasePage {
   	@FindBy(xpath = "//div[contains(@class,'dataTables_paginate')]//a[contains(@class,'paginate_button') and not(contains(@class,'disabled'))]")
   	public List<WebElement> pagination;
   	
-  	@FindBy(id = "activityRecurrenceTable_paginate")
-  	WebElement paginatePanel;
+  	@FindBy(xpath = "//div[contains(@class,'dataTables_paginate ')]")
+  	public WebElement paginatePanel;
   	
   	@FindBy(xpath = "//div[contains(@class,'dataTables_paginate')]//a[text()='Previous']")
   	public WebElement previousButton;

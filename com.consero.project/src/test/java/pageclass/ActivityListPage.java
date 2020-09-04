@@ -158,14 +158,7 @@ public class ActivityListPage extends BasePage{
 	
 	public void selctShowEntries() {
 		select = new Select(entriesDropdown);
-		List<WebElement> options = select.getOptions();
-		int index = 0;
-		if(options.size()>1){
-		    index = random.nextInt(options.size()-1);
-		 }
-		 if (index >= 0){
-			 select.selectByIndex(index);
-		 }
+		select.selectByVisibleText("25");
 	}
 	
 	public String getSelectedEntries() {
@@ -174,8 +167,7 @@ public class ActivityListPage extends BasePage{
 	}
 	
 	public String getLastPageCount() {
-		int paginationCount = pagination.size()-2;
-		WebElement lastPageNo = driver.findElement(By.xpath("//div[@id='activitiesTable_paginate']//span//a[" + paginationCount + "]"));
+		WebElement lastPageNo = driver.findElement(By.xpath("//div[@id='activitiesTable_paginate']//span//a[last()]"));
 		return lastPageNo.getText();
 	}
 	

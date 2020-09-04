@@ -13,6 +13,8 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.util.Strings;
 
+import com.relevantcodes.extentreports.LogStatus;
+
 public class RecurranceManagementPage extends BasePage {
 	
 	WebDriver driver;
@@ -24,9 +26,12 @@ public class RecurranceManagementPage extends BasePage {
 	WebElement search;
 	
 	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr//td[9]")
-	WebElement status;
+	List<WebElement> status;
 	
-	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr//td")
+	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr[1]//td[3]")
+	WebElement activtyName;
+	
+	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr//td[@class='dataTables_empty']")
 	public WebElement recurranceTable;
 	
 	@FindBy(name = "activityRecurrenceTable_length")
@@ -47,6 +52,36 @@ public class RecurranceManagementPage extends BasePage {
 	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr//td[3]")
 	List<WebElement> activityNames;
 	
+	@FindBy(xpath = "//input[@id='cancelEditActivity']")
+	WebElement cancelRecurrance;
+	
+	@FindBy(id = "recurrenceEditActivityDialogue")
+	WebElement recurranceModal;
+	
+	@FindBy(id = "EditActivity")
+	WebElement editActivity;
+	
+	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr[1]//td//a[text()='Edit']")
+	WebElement edit;
+	
+	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr[1]//td//a[text()='View']")
+	WebElement view;
+	
+	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr[1]//td//a[text()='End']")
+	WebElement end;
+	
+	@FindBy(id = "EditActivityConfirm")
+	WebElement editActivityConfirm;
+	
+	@FindBy(xpath = "//div[@id='EditActivityConfirm']//h4")
+	WebElement editModalContent;
+	
+	@FindBy(xpath = "//div[@id='EditActivityConfirm']//input[@value='Yes']")
+	WebElement yes;
+	
+	@FindBy(xpath = "//div[@id='activityRecurrenceTable_wrapper']//table[@id='activityRecurrenceTable']//tbody//tr[1]//td[3]")
+	WebElement activity;
+	
 	public RecurranceManagementPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -57,11 +92,28 @@ public class RecurranceManagementPage extends BasePage {
 		return ((JavascriptExecutor) driver).executeScript("return arguments[0].value;",search).toString();
 	}
 	
+	public void clearSearch() {
+		search.clear();
+	}
+	
 	public void setSearch(String value) {
 		if(!Strings.isNullOrEmpty(this.getSearch())) {
-			search.clear();
+			this.clearSearch();
 		}
 		search.sendKeys(value);
+	}
+	
+	public boolean isReccurranceSearched(String name) {
+		for(WebElement activityName: activityNames) {
+			if(!activityName.getText().contains(name)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public String getActivtyName() {
+		return activtyName.getText().trim();
 	}
 	
 	public String getSelectedEntries() {
@@ -70,8 +122,7 @@ public class RecurranceManagementPage extends BasePage {
 	}
 	
 	public String getLastPageCount() {
-		int paginationCount = pagination.size()-2;
-		WebElement lastPageNo = driver.findElement(By.xpath("//div[@id='activityRecurrenceTable_paginate']//a[" + paginationCount + "]"));
+		WebElement lastPageNo = driver.findElement(By.xpath("//div[@id='activityRecurrenceTable_paginate']//span//a[last()]"));
 		return lastPageNo.getText();
 	}
 	
@@ -81,14 +132,7 @@ public class RecurranceManagementPage extends BasePage {
 	
 	public void selectShowEntries() {
 		select = new Select(entriesDropdown);
-		List<WebElement> options = select.getOptions();
-		int index = 0;
-		if(options.size()>1){
-		    index = random.nextInt(options.size()-1);
-		 }
-		 if (index >= 0){
-			 select.selectByIndex(index);
-		 }
+		select.selectByVisibleText("25");
 	}
 	
 	public void clickOnCsv() {
@@ -99,10 +143,17 @@ public class RecurranceManagementPage extends BasePage {
 		excel.click();
 	}
 	
-	public void clickOnActivityName() {
-		activityName.click();
+	public boolean checkExportFileButton() {
+		if(isElementPresent(csv, 30) && isElementPresent(excel, 30)) {
+			return true;
+		}
+		return false;
 	}
 	
+	public void clickOnActivityName() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", activityName);
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", activityName);
+	}
 
 	public boolean isFieldNameAscendingOrder() {
 		List<String> list = new ArrayList<String>();
@@ -129,5 +180,70 @@ public class RecurranceManagementPage extends BasePage {
 		}
 		return false;
 	}
+	
+	public void clickOnView() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", view);
+	}
+	
+	public void clickOnEdit() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", edit);
+	}
+	
+	public void clickOnEnd() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", end);
+	}
+	
+	public void clickOnEditActivity() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", editActivity);
+	}
+	
+	public boolean isRecurranceModalExist() {
+		return isElementPresent(recurranceModal, 30);
+	}
+	
+	public void clickOnCancelRecurrance() {
+		cancelRecurrance.click();
+	}
+	
+	public boolean isConfirmModalExist() {
+		return isElementPresent(editActivityConfirm, 30);
+	}
+	
+	public String getEditModalContent() {
+		return editModalContent.getText().trim();
+	}
+	
+	public void confirmEditModal(String content) {
+		if(this.isConfirmModalExist() && this.getEditModalContent().equals(content)) {
+			this.clickOnYes();
+		}
+	}
+	
+	public void clickOnYes() {
+		yes.click();
+	}
+	
+	public void editRecurranceDetails(String content) {
+		if(this.isRecurranceModalExist()) {
+			this.confirmEditModal(content);
+		}
+	}
+	
+	public String getActivity() {
+		return activity.getText().trim();
+	}
+	
+	public boolean isActivityEnded(String name) {
+		for(int i=0; i<activityNames.size(); i++) {
+			if(activityName.getText().equals(name)) {
+				WebElement status = driver.findElement(By.xpath(""));
+				if(status.getText().trim().equals("Terminated")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	
 }

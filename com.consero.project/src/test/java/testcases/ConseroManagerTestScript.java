@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Parameters;
@@ -23,6 +26,7 @@ import pageclass.HomePage;
 import pageclass.LoginPage;
 import pageclass.RecurranceManagementPage;
 import pageclass.UploadActivityTemplatePage;
+import pageclass.WorkloadPage;
 import utility.DataReader;
 import utility.ExtentTestManager;
 
@@ -39,6 +43,7 @@ public class ConseroManagerTestScript extends BaseTest {
 	ActivityDetailsPage activityDetailsPageObj = null;
 	UploadActivityTemplatePage activityTemplatePageObj = null;
 	RecurranceManagementPage recurranceManagementPageObj = null;
+	WorkloadPage workloadPageObj = null;
 
 	String sheetName = "credentials";
 	String managerUsername = "", managerPassword = "", managerName = "";
@@ -852,7 +857,7 @@ public class ConseroManagerTestScript extends BaseTest {
 	public void recurranceManagementTC() {
 		homePageObj = new HomePage(driver);
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);
-		String submenu = "Recurrence Management";
+		String submenu = "Recurrence Management", activityName = "";
 		try {
 			sleep();
 			homePageObj.moveToControlDock();
@@ -860,6 +865,30 @@ public class ConseroManagerTestScript extends BaseTest {
 			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
 			test.log(LogStatus.INFO, submenu + " Page opened sucessfully!!");
 			
+			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 30)) {
+				test.log(LogStatus.INFO, "No reccrances found.");
+			} else {
+				test.log(LogStatus.INFO, "Recurrances is displayed in list.");
+			}
+			
+			if(recurranceManagementPageObj.checkExportFileButton()) {
+				test.log(LogStatus.INFO, "'CSV' and 'EXCEL' button is available to export file!!");
+			}
+			
+			activityName = recurranceManagementPageObj.getActivtyName();
+			recurranceManagementPageObj.setSearch(activityName);
+			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 10)) {
+				test.log(LogStatus.INFO, "No reccrances found.");
+			} else {
+				if(recurranceManagementPageObj.isReccurranceSearched(activityName)) {
+					test.log(LogStatus.PASS, "Recurrance searched successfully.");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to search Recurrance.");
+				}
+			}
+			takeScreenshot();
+			recurranceManagementPageObj.clearSearch();
+			test.log(LogStatus.INFO, "cleared search result.");
 		} catch(Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify recuurence management. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
@@ -867,84 +896,6 @@ public class ConseroManagerTestScript extends BaseTest {
 	}
 	
 	@Test(priority=24)
-	public void recurranceManagementPaginationTC() {
-		homePageObj = new HomePage(driver);
-		recurranceManagementPageObj = new RecurranceManagementPage(driver);
-		try {
-			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
-			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 30)) {
-				test.log(LogStatus.INFO, "No reccrances found.");
-			}
-			
-			if(basePage.pagination.size()>0) {
-				test.log(LogStatus.INFO, "Pagination Found.");
-				basePage.clickOnPagination();
-			} else {
-				test.log(LogStatus.INFO, "Pagination Not Found.");
-			}
-			takeScreenshot();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=25)
-	public void verifyRecurrancePreviousAndNextPageTC() {
-		try {
-			this.prevoiusAndNextPagination();
-			takeScreenshot();
-		} catch(Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to verify previous and next pagination in Recurrance Management. " + ExceptionUtils.getStackTrace(e));
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=26)
-	public void verifyRecurranceFirstAndLastPageTC() {
-		try {
-			this.firstAndLastPagination();
-			takeScreenshot();
-		} catch(Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to verify first and last pagination in Recurrance Management. " + ExceptionUtils.getStackTrace(e));
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=27)
-	public void showRecurranceEntriesTC() {
-		recurranceManagementPageObj = new RecurranceManagementPage(driver);
-		int entries = 0;
-		String selectedEntries = "";
-		try {
-			Thread.sleep(5000);
-			selectedEntries = recurranceManagementPageObj.getSelectedEntries();
-			String pageCount = recurranceManagementPageObj.getLastPageCount();
-			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + pageCount);
-			recurranceManagementPageObj.selectShowEntries();
-			sleep();
-			try {
-				entries = Integer.parseInt(recurranceManagementPageObj.getSelectedEntries());
-			} catch(NumberFormatException nfe) {
-				System.out.println("NumberFormatException: " + nfe.getMessage());
-			}
-			System.out.println(entries);
-			
-			int count = recurranceManagementPageObj.getRecurranceCount();
-			System.out.println(count);
-			if(entries == count) {
-				test.log(LogStatus.PASS, "Recurrance count is equal to selected entries.");
-			} else {
-				test.log(LogStatus.FAIL, "Recurrance count is not equal to selected entries.");
-			}
-			takeScreenshot();
-			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + recurranceManagementPageObj.getLastPageCount());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=28)
 	public void exportRecurrancesTC() {
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);
 		String csvFileName = "Recurrence details.csv",
@@ -965,6 +916,85 @@ public class ConseroManagerTestScript extends BaseTest {
 			} else {
 				test.log(LogStatus.FAIL, "Failed to Download CSV Reccurance File!!");
 			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=25)
+	public void recurranceManagementPaginationTC() {
+		homePageObj = new HomePage(driver);
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		try {
+			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
+			if(basePage.pagination.size()>0) {
+				test.log(LogStatus.INFO, "Pagination Found.");
+				basePage.clickOnPagination();
+			} else {
+				test.log(LogStatus.INFO, "Pagination Not Found.");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=26)
+	public void verifyRecurrancePreviousAndNextPageTC() {
+		try {
+			this.prevoiusAndNextPagination();
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to verify previous and next pagination in Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=27)
+	public void verifyRecurranceFirstAndLastPageTC() {
+		try {
+			this.firstAndLastPagination();
+			takeScreenshot();
+		} catch(Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to verify first and last pagination in Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=28)
+	public void showRecurranceEntriesTC() {
+		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		int entries = 0;
+		int count = 0;
+		try {
+			if(basePage.firstButton.isEnabled()) {
+				basePage.clickOnFirstPagination();
+			}
+			int selectedEntries = Integer.parseInt(recurranceManagementPageObj.getSelectedEntries());
+			String pageCount = recurranceManagementPageObj.getLastPageCount();
+			count = recurranceManagementPageObj.getRecurranceCount();
+			if(selectedEntries == count) {
+				test.log(LogStatus.PASS, "Recurrance count - " +count+  " is equal to selected entries - " + selectedEntries);
+			} else {
+				test.log(LogStatus.FAIL, "Recurrance count is not equal to selected entries.");
+			}
+			test.log(LogStatus.INFO, "selected entry is : " + selectedEntries + "and page count displayed in pagination is : " + pageCount);
+			recurranceManagementPageObj.selectShowEntries();
+			sleep();
+			try {
+				entries = Integer.parseInt(recurranceManagementPageObj.getSelectedEntries());
+			} catch(NumberFormatException nfe) {
+				System.out.println("NumberFormatException: " + nfe.getMessage());
+			}
+			count = recurranceManagementPageObj.getRecurranceCount();
+			if(entries == count) {
+				test.log(LogStatus.PASS,  "Recurrance count - " +count+  " is equal to selected entries - " + entries);
+			} else {
+				test.log(LogStatus.FAIL, "Recurrance count is not equal to selected entries.");
+			}
+			takeScreenshot();
+			test.log(LogStatus.INFO, "selected entry is : " + recurranceManagementPageObj.getSelectedEntries() + "and page count displayed in pagination is : " + recurranceManagementPageObj.getLastPageCount());
+			sleep();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -993,35 +1023,127 @@ public class ConseroManagerTestScript extends BaseTest {
 		}
 	}
 	
-	//@Test(priority = 30)
+	@Test(priority = 30)
 	public void viewRecurranceTC() {
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		String status = "Terminated";
 		try {
-			
+			recurranceManagementPageObj.setSearch(status);
+			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 10)) {
+				test.log(LogStatus.INFO, "No reccrances found.");
+			} else {
+				recurranceManagementPageObj.clickOnView();
+				if(recurranceManagementPageObj.isRecurranceModalExist()) {
+					test.log(LogStatus.INFO, "'Recurrence Details' popup is opened !!!!");
+					takeScreenshot();
+					recurranceManagementPageObj.clickOnCancelRecurrance();
+					basePage.waitUntilElementInvisible("//div[contains(@class,'addActivityDialogue')]", 30);
+				}
+			}
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to view Recurrance Management. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	//@Test(priority = 31)
+	@Test(priority = 31)
 	public void editReccuranceTC() {
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		String status = "Active",
+			   content = "Do you want to save changes to future month close templates?";
 		try {
-			
+			recurranceManagementPageObj.setSearch(status);
+			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 10)) {
+				test.log(LogStatus.INFO, "No reccrances found.");
+			} else {
+				recurranceManagementPageObj.clickOnEdit();
+				if(recurranceManagementPageObj.isRecurranceModalExist()) {
+					try {
+						test.log(LogStatus.INFO, "'Edit Recurrence Details' popup is opened !!!!");
+						recurranceManagementPageObj.confirmEditModal(content);
+						basePage.waitUntilElementInvisible("//div[contains(@class,'addActivityDialogue')]", 30);
+					} catch(Exception e) {
+						recurranceManagementPageObj.clickOnCancelRecurrance();
+					}
+				}
+			}
+			takeScreenshot();
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to edit Recurrance Management. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	//@Test(priority = 32)
+	@Test(priority = 32)
 	public void endReccuranceTC() {
 		recurranceManagementPageObj = new RecurranceManagementPage(driver);
+		homePageObj = new HomePage(driver);
+		String submenu = "Recurrence Management",
+			   status = "Active",
+			   activityName = "";
 		try {
-			
+			homePageObj.moveToControlDock();
+			homePageObj.selectControldockSubmennu(submenu);
+			Assert.assertTrue(basePage.isElementPresent(recurranceManagementPageObj.pageTitle, 60));
+			test.log(LogStatus.INFO, submenu + " Page opened sucessfully!!");
+			sleep();
+			recurranceManagementPageObj.setSearch(status);
+			if(basePage.isElementPresent(recurranceManagementPageObj.recurranceTable, 30)) {
+				test.log(LogStatus.INFO, "No reccrances found.");
+			} else {
+				activityName = recurranceManagementPageObj.getActivity();
+				recurranceManagementPageObj.clickOnEnd();
+				driver.switchTo().alert().accept();
+				sleep();
+				recurranceManagementPageObj.setSearch(activityName);
+				if(recurranceManagementPageObj.isActivityEnded(activityName)) {
+					test.log(LogStatus.PASS, "Activity Ended sucessfully and status changed to terminated!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to end Activity!!!");
+				}
+			}
+			takeScreenshot();
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to end Recurrance Management. " + ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 32)
+	public void workloadTC() {
+		homePageObj = new HomePage(driver);
+		workloadPageObj = new WorkloadPage(driver);
+		String submenu = "Workload";
+		try {
+			homePageObj.moveToControlDock();
+			homePageObj.selectControldockSubmennu(submenu);
+			Assert.assertTrue(basePage.isElementPresent(workloadPageObj.pageTitle, 60));
+			test.log(LogStatus.INFO, submenu + " Page opened sucessfully!!");
+			sleep();
+			if(workloadPageObj.isWorkloadFilterDisplayed()) {
+				test.log(LogStatus.INFO, "workload filter is displayed by default!!");
+			}
+			
+			workloadPageObj.clickOnBtnHeader();
+			if(!workloadPageObj.isWorkloadFilterDisplayed()) {
+				test.log(LogStatus.PASS, "After click on collapse button workload filter is not displayed!!");
+				workloadPageObj.clickOnBtnHeader();
+				if(workloadPageObj.isWorkloadFilterDisplayed()) {
+					test.log(LogStatus.PASS, "workload filter is displayed!!");
+				}
+			} else {
+				test.log(LogStatus.FAIL, "After click on collapse button workload filter should not displayed!!");
+			}
+			
+			if(workloadPageObj.ischartDisplayed()) {
+				test.log(LogStatus.PASS, "workload Chart is displayed!!");
+			}
+			takeScreenshot();
+			
+			
+			
+		} catch (Exception e) {
+			test.log(LogStatus.ERROR, "Unsuccessful to verify workload. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
@@ -1035,6 +1157,7 @@ public class ConseroManagerTestScript extends BaseTest {
 			} else {
 				basePage.clickOnNextPagination();
 			}
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", basePage.paginatePanel);
 			takeScreenshot();
 			if(basePage.nextButton.isEnabled()) {
 				basePage.clickOnNextPagination();
@@ -1042,6 +1165,7 @@ public class ConseroManagerTestScript extends BaseTest {
 			} else {
 				basePage.clickOnPreviousPagination();
 			}
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", basePage.paginatePanel);
 		} else {
 			test.log(LogStatus.INFO, "Pagination Not Found.");
 		}
@@ -1057,6 +1181,7 @@ public class ConseroManagerTestScript extends BaseTest {
 				basePage.clickOnLastPagination();
 				test.log(LogStatus.INFO, "First page is already selected so, clicked on last pagination link successfully.");
 			}
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", basePage.paginatePanel);
 			sleep();
 			takeScreenshot();
 			
@@ -1067,6 +1192,7 @@ public class ConseroManagerTestScript extends BaseTest {
 				basePage.clickOnFirstPagination();
 				test.log(LogStatus.INFO, "Last page is already selected so, clicked on first pagination link successfully.");
 			}
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", basePage.paginatePanel);
 			sleep();
 		} else {
 			test.log(LogStatus.INFO, "Pagination Not Found.");
