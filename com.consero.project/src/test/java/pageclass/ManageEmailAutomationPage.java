@@ -51,11 +51,25 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(xpath = "//a[text()='Add Reminder Level']")
 	WebElement addReminderLevel;
 	
-	@FindBy(name = "Save Email Reminder Level")
+	@FindBy(xpath = "//table[@id='reminderLevelBillsTable']//tbody//tr[2]//input[@name='reminderLevelFromForBills']")
+	WebElement reminderFrom1;
+	
+	@FindBy(xpath = "//table[@id='reminderLevelBillsTable']//tbody//tr[2]//input[@name='reminderLevelToForBills']")
+	WebElement reminderTo1;
+	
+	@FindBy(xpath = "//table[@id='reminderLevelBillsTable']//tbody//tr[2]//select[contains(@class,'selectTemplateForBills')]")
+	WebElement template1;
+	
+	@FindBy(xpath = "//div[@id='billsConfiguration']//button[text()='Save']")
 	WebElement saveReminderLevel;
 	
-	//email frequency
+	@FindBy(xpath = "//table[@id='reminderLevelBillsTable']//tbody//tr[2]//a[@class='deleteReminderLevelForBills']")
+	WebElement delete;
 	
+	@FindBy(xpath = "//table[@id='reminderLevelBillsTable']//tbody//tr[2]")
+	WebElement reinderlevel2;
+	
+	//email frequency
 	
 	@FindBy(xpath = "//div[contains(@class,'billsEmailFrequency')]")
 	WebElement emailFrequency;
@@ -189,7 +203,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	}
 	
 	public void clickOnAddReminderLevel() {
-		addReminderLevel.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", addReminderLevel);
 	}
 	
 	public void clickOnSaveReminderLevel() {
@@ -202,6 +216,41 @@ public class ManageEmailAutomationPage extends BasePage {
 			this.selectTemplate(name);
 			this.clickOnSaveReminderLevel();
 		}
+	}
+	
+	public void setReminderTo1(String from) {
+		reminderTo1.sendKeys(from);
+	}
+	
+	public void selectTemplate1(String name) {
+		Select select = new Select(template1);
+		select.selectByVisibleText(name);
+	}
+	
+	public String getReminderFrom() {
+		return reminderFrom1.getAttribute("value");
+	}
+	
+	public boolean isReminderFromDisabled() {
+		return reminderFrom1.isEnabled();
+	}
+	
+	public void setAddReminderLevel(String from, String name) {
+		this.setReminderTo1(from);
+		this.selectTemplate1(name);
+		this.clickOnSaveReminderLevel();
+	}
+	
+	public void clickOnDelete() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", delete);
+	}
+	
+	public boolean isDeleteExist() {
+		return isElementPresent(delete,30);
+	}
+	
+	public boolean isReinderLevel2Exist() {
+		return isElementPresent(reinderlevel2,30);
 	}
 	
 	//Email Frequency
@@ -232,7 +281,6 @@ public class ManageEmailAutomationPage extends BasePage {
 	
 	public void clickOnSaveEmailFrequency() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", saveEmailFrequency);
-//		saveEmailFrequency.click();
 	}
 	
 	public void setBizdaysCutOffDays(String day) {
@@ -307,11 +355,11 @@ public class ManageEmailAutomationPage extends BasePage {
 	public boolean checkAuditLog(String date, String field, String value) {
 		try {
 			for(int i=0; i<auditedDates.size(); i++) {
-				if(auditedDates.get(i).getText().contains(date)) {
+				if(auditedDates.get(i).getText().trim().contains(date)) {
 					 for(int j=0; i< fieldNames.size(); j++) {
-						if(fieldNames.get(j).getText().contains(field)) {
+						if(fieldNames.get(j).getText().trim().contains(field)) {
 						  WebElement newValue = driver.findElement(By.xpath("//table[@id='emailEditLogsTable']//tbody//tr[" + (j+1) + "]//td[3]"));
-						  if (newValue.getText().equals(value)) {
+						  if (newValue.getText().trim().equals(value)) {
 							  return true;
 							}
 						}

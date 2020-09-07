@@ -1,5 +1,6 @@
 package pageclass;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -8,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
 
 public class ManageDepartmentExpensePage extends BasePage{
 	WebDriver driver;
@@ -21,7 +23,16 @@ public class ManageDepartmentExpensePage extends BasePage{
 	@FindBy(id = "userLevelDEPermissionTab")
 	WebElement userView;
 	
-	@FindBy(xpath = "//select[@id='userList']//following-sibling::div//button[contains(@title,'None selected')]")
+	@FindBy(xpath = "//div[@id='departmentExpenseDepartmentlevelPermission']//button[contains(@class,'dropdown-toggle')]")
+	WebElement departmentDropdown;
+	
+	@FindBy(xpath = "//ul[@class='multiselect-container dropdown-menu']//li[not(contains(@class,'filter-hidden'))]//a[@class='multiselect-all']")
+	WebElement allDepartment;
+	
+	@FindBy(xpath = "//div[@id='accordionDepartment']//div[contains(@class,'selectedDepartmentList')]//h4//span[@class='bold']")
+	List<WebElement> departments;
+	
+	@FindBy(xpath = "//div[@id='departmentExpenseUserlevelPermission']//button[contains(@class,'dropdown-toggle')]")
 	WebElement userDropdown;
 	
 	@FindBy(xpath = "//input[contains(@class,'multiselect-search')]")
@@ -41,6 +52,9 @@ public class ManageDepartmentExpensePage extends BasePage{
 	
 	@FindBy(xpath = "//div[@id='accordionUserWise']//div[contains(@class,'selectedUserList')]//h4//span[@class='bold']")
 	WebElement username;
+	
+	@FindBy(xpath = "//div[@id='accordionUserWise']//div[contains(@class,'selectedUserList')]")
+	WebElement userViewPanel;
 	
 	@FindBy(xpath = "//div[@id='accordionUserWise']//div[contains(@class,'selectedUserList')]//input[@class='userViewParentCheckbox']")
 	WebElement departmentToggle;
@@ -107,7 +121,11 @@ public class ManageDepartmentExpensePage extends BasePage{
 	}
 	
 	public String getUsername() {
-		return username.getText();
+		String user = "";
+		if(isElementPresent(userViewPanel, 30)) {
+			user = username.getText();
+		}
+		return user;
 	}
 	
 	public void clickOnDepartmentToggle() {
@@ -145,5 +163,32 @@ public class ManageDepartmentExpensePage extends BasePage{
 	
 	public void clickOnCloseAuditLogModal() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", closeAuditLogModal);
+	}
+	
+	public void clickOnDepartmentDropdown() {
+		departmentDropdown.click();
+	}
+	
+	public void clickOnAllDepartment() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", allDepartment);
+	}
+	
+	public void setDepartmentDetails() {
+		this.clickOnDepartmentDropdown();
+		this.clickOnAllDepartment();
+		this.clickOnSave();
+	}
+	
+	public boolean isDepartmentAdded() {
+		String option = departmentDropdown.getAttribute("title");
+		String[] department = option.split(", ");
+		String[] departmentAdded = new String[departments.size()];
+		for(int i=0; i<departments.size(); i++) {
+			departmentAdded[i] = departments.get(i).getText();
+		}
+		if(Arrays.asList(department).equals(Arrays.asList(departmentAdded))) {
+			return true;
+		}
+		return false;
 	}
 }

@@ -238,6 +238,12 @@ public class BaseTest {
 		return df.format(dateobj);
 	}
 	
+	public String getCurrentDateInFormatM_d_YYYY() {
+		DateFormat df = new SimpleDateFormat("M/d/yyyy");
+		Date dateobj = new Date();
+		return df.format(dateobj);
+	}
+	
 	public String getdayFromDateFormat(String date) {
 		String dateParts[] = date.split("/");
 		return dateParts[1];

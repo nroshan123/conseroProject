@@ -64,7 +64,7 @@ public class ConseroAdminTestScript extends BaseTest {
 	
 	String sheetName = "credentials";
 	String adminUser = "", adminPassword = "";
-	String companyName= "", username ="", emailTemplateName="";
+	String companyName= "automation_test_company_TLq", username ="", emailTemplateName="";
 	
 	@BeforeMethod(alwaysRun = true)
 	public void setUp(Method method) {
@@ -345,7 +345,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=8)
+	//@Test(priority=8)
 	public void verifyEnableAndDisableClientsTC() {
 		homePageObj = new HomePage(driver);
 		companyListPageObj = new CompanyListPage(driver);
@@ -375,7 +375,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=9)
+	//@Test(priority=9)
 	public void createCompanyTC() {
 		addCompanyPageObj = new AddCompanyPage(driver);
 		companyListPageObj = new CompanyListPage(driver);
@@ -439,6 +439,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		companyListPageObj = new CompanyListPage(driver);
 		try {
 			companyListPageObj.setCompanySearch(companyName);
+			pressEnter();
 			sleep();
 			if (companyListPageObj.isCompanyExist(companyName)) {
 				companyListPageObj.clickOnDetails();
@@ -1034,9 +1035,10 @@ public class ConseroAdminTestScript extends BaseTest {
 	@Test(priority = 28)
 	public void emailReminderLevelTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
-		String from = "2",
+		String from = generateNumberExceptZero(10),
 			   successMessage = "Email Reminder Level Configured successfully";
-		System.out.println(emailTemplateName);
+		int from1 = Integer.parseInt(from)+1;
+		String reminderFrom = String.valueOf(from1);
 		try {
 			sleep();
 			Assert.assertTrue(manageEmailPageObj.isEmailReminderLevelEnabled());
@@ -1046,16 +1048,38 @@ public class ConseroAdminTestScript extends BaseTest {
 				test.log(LogStatus.PASS, "reminder level added successfully!!!!");
 			}
 			takeScreenshot();
+			sleep();
+			manageEmailPageObj.clickOnAddReminderLevel();
+			if(!manageEmailPageObj.isReminderFromDisabled()) {
+				test.log(LogStatus.INFO, "reminder level from is disabled!!!!");
+			}
+			String from2 = manageEmailPageObj.getReminderFrom();
+			if(reminderFrom.equals(from2)) {
+				test.log(LogStatus.INFO, "reminder level from is 1 greater that reminder from 1!!!!");
+			}
+			takeScreenshot();
+			int reminderFrom1 = Integer.parseInt(from2) + 2;
+			String reminderFrom2 = String.valueOf(reminderFrom1);
+			manageEmailPageObj.setAddReminderLevel(reminderFrom2, emailTemplateName);
+			if(basePage.checkSuccessMessage(successMessage)) {
+				test.log(LogStatus.PASS, "reminder level added successfully!!!!");
+			}
+			takeScreenshot();
 		} catch (Exception e) {
-			test.log(LogStatus.ERROR, "Unsuccessful to delete kickoff. " + ExceptionUtils.getStackTrace(e));
+			test.log(LogStatus.ERROR, "Unsuccessful to add email reminder level. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 	}
 	
-	// @Test(priority = 29)
+	@Test(priority = 29)
 	public void deleteEmailReminderLevelTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
 		try {
+			Assert.assertTrue(manageEmailPageObj.isDeleteExist());
+			manageEmailPageObj.clickOnDelete();
+			if(!manageEmailPageObj.isReinderLevel2Exist()) {
+				test.log(LogStatus.INFO, "email reminder level is deleted sucessfully!!!!");
+			}
 			takeScreenshot();
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify email reminder. " + ExceptionUtils.getStackTrace(e));
@@ -1095,7 +1119,7 @@ public class ConseroAdminTestScript extends BaseTest {
 	@Test(priority = 31)
 	public void emailAuditLogTC() {
 		manageEmailPageObj = new ManageEmailAutomationPage(driver);
-		String date = getCurrentDate(),
+		String date = getCurrentDateInFormatM_d_YYYY(),
 				typeLevel = manageEmailPageObj.getTypeLevel(),
 				billPendingLevel = manageEmailPageObj.getBillsPendingLevel(),
 				bizDaysLevel = manageEmailPageObj.getBillsBizDayLevel(),
@@ -1194,7 +1218,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		homePageObj = new HomePage(driver);
 		companyDetailsPageObj = new CompanyDetailsPage(driver);
 		manageDepartmentExpensePageObj = new ManageDepartmentExpensePage(driver);
-//		String message = "Data updated successfully";
+		String message = "Data updated successfully";
 		String username = "Neha Roshan";
 		try {
 			sleep();
@@ -1211,7 +1235,19 @@ public class ConseroAdminTestScript extends BaseTest {
 					companyDetailsPageObj.clickOnManageDepartmentExpense();
 					if(basePage.isElementPresent(manageDepartmentExpensePageObj.pageTitle, 40)) {
 						sleep();
+						manageDepartmentExpensePageObj.setDepartmentDetails();
+						if(basePage.checkSuccessMessage(message)) {
+							test.log(LogStatus.INFO, "success message recieved!!!!");
+						}
+						if(manageDepartmentExpensePageObj.isDepartmentAdded()) {
+							test.log(LogStatus.PASS, "Department added successfully in department view!!!!");
+						} else {
+							test.log(LogStatus.FAIL, "Failed to add department in department view!!!!");
+						}
+						takeScreenshot();
+						
 						manageDepartmentExpensePageObj.clickOnUserView();
+						manageDepartmentExpensePageObj.clickOnUserDropdown();
 						manageDepartmentExpensePageObj.setSearch(username);
 						sleep();
 						manageDepartmentExpensePageObj.selectUserOption(username);
