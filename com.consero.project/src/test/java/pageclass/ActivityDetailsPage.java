@@ -160,6 +160,18 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(id = "ConfirmActivityChange")
 	WebElement confirmActivityChange;
 	
+	@FindBy(id = "detailsForm")
+	WebElement activityDetailsPage;
+	
+	@FindBy(id = "CompleteValidation")
+	WebElement completeValidation;
+	
+	@FindBy(id = "viewFinancials")
+	WebElement viewFinancials;
+	
+	@FindBy(xpath = "//a[contains(text(),'COA Validations')]")
+	WebElement coaValidation;
+	
 	public ActivityDetailsPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -435,4 +447,17 @@ public class ActivityDetailsPage extends BasePage {
 	public void clickOnConfirmActivityChange() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", confirmActivityChange);
 	}
+	
+	public void clickOnCompleteValidation() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", completeValidation);
+	}
+	
+	public void clickOnViewFinancials() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", viewFinancials);
+	}
+	
+	public void clickOnCoaValidation() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", coaValidation);
+	}
+	
 }

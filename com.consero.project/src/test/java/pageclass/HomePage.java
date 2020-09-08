@@ -29,6 +29,9 @@ public class HomePage extends BasePage {
 	@FindBy(xpath = "//div[@id='sideNavList']//ul//li[@id='users']")
 	WebElement users;
 	
+	@FindBy(xpath = "//li[@id='header_profile_bar']//span[@class='username']")
+	WebElement loggedInUsername;
+	
 	@FindBy(xpath = "//div[@id='sideNavList']//ul//li[@id='Companies']")
 	WebElement companies;
 	
@@ -186,6 +189,14 @@ public class HomePage extends BasePage {
 	
 	public void clickOnRecurringActivityTemplate() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", recurringActivityTemplate);
+	}
+	
+	public boolean isLoggedInUsernameExist() {
+		return isElementPresent(loggedInUsername, 60);
+	}
+	
+	public String getLoggedInUsername() {
+		return loggedInUsername.getText();
 	}
 	
 }

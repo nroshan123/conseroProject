@@ -105,6 +105,15 @@ public class ActivityListPage extends BasePage{
 	@FindBy(id = "btnBackToActivityIndex")
 	WebElement btnBackToActivity;
 	
+	@FindBy(xpath = "//td[@class='activitySelectedClient']//button[contains(@class,'dropdown-toggle')]")
+	WebElement clientDropdown;
+	
+	@FindBy(xpath = "//td[@class='activitySelectedClient']//ul[contains(@class,'dropdown-menu')]//input[contains(@class,'multiselect-search')]")
+	WebElement searchClient;
+	
+	@FindBy(xpath = "//td[@class='activitySelectedClient']//ul[contains(@class,'dropdown-menu')]//li")
+	List<WebElement> clientOptions;
+	
 	public ActivityListPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -282,4 +291,20 @@ public class ActivityListPage extends BasePage{
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", btnBackToActivity);
 	}
 	
+	public void clickOnClientDropdown() {
+		clientDropdown.click();
+	}
+	
+	public void setSearchClient(String value) {
+		searchClient.sendKeys(value);
+	}
+	
+	public void selectClient(String client) {
+		for(WebElement clientOption:clientOptions) {
+			if(clientOption.getText().equals(client)) {
+				clientOption.click();
+				break;
+			}
+		}
+	}
 }

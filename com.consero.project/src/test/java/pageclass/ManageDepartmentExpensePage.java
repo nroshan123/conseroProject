@@ -26,7 +26,7 @@ public class ManageDepartmentExpensePage extends BasePage{
 	@FindBy(xpath = "//div[@id='departmentExpenseDepartmentlevelPermission']//button[contains(@class,'dropdown-toggle')]")
 	WebElement departmentDropdown;
 	
-	@FindBy(xpath = "//ul[@class='multiselect-container dropdown-menu']//li[not(contains(@class,'filter-hidden'))]//a[@class='multiselect-all']")
+	@FindBy(xpath = "//div[@id='departmentExpenseDepartmentlevelPermission']//ul[@class='multiselect-container dropdown-menu']//li//a[@class='multiselect-all']/label[contains(text(),'Select All')]")
 	WebElement allDepartment;
 	
 	@FindBy(xpath = "//div[@id='accordionDepartment']//div[contains(@class,'selectedDepartmentList')]//h4//span[@class='bold']")
@@ -56,7 +56,7 @@ public class ManageDepartmentExpensePage extends BasePage{
 	@FindBy(xpath = "//div[@id='accordionUserWise']//div[contains(@class,'selectedUserList')]")
 	WebElement userViewPanel;
 	
-	@FindBy(xpath = "//div[@id='accordionUserWise']//div[contains(@class,'selectedUserList')]//input[@class='userViewParentCheckbox']")
+	@FindBy(xpath = "//div[@id='accordionUserWise']//div[contains(@class,'selectedUserList')]//label[@id='selectAllUserDepartmentBox']//span[contains(@class,'slider')]")
 	WebElement departmentToggle;
 	
 	//audit log
@@ -100,8 +100,8 @@ public class ManageDepartmentExpensePage extends BasePage{
 	
 	public void selectUserOption(String name) {
 		for(WebElement user:userOption) {
-			if(user.getText().equals(name)) {
-				user.click();
+			if(user.getText().trim().equals(name)) {
+				((JavascriptExecutor) driver).executeScript("arguments[0].click()", user);
 				break;
 			}
 		}
@@ -174,9 +174,14 @@ public class ManageDepartmentExpensePage extends BasePage{
 	}
 	
 	public void setDepartmentDetails() {
-		this.clickOnDepartmentDropdown();
-		this.clickOnAllDepartment();
-		this.clickOnSave();
+		try {
+			this.clickOnDepartmentDropdown();
+			Thread.sleep(2000);
+			this.clickOnAllDepartment();
+			this.clickOnSave();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean isDepartmentAdded() {

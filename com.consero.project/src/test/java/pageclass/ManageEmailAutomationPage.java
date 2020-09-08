@@ -110,7 +110,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	@FindBy(xpath = "//span[@class='multiselect-selected-text']")
 	WebElement selectedBizDays;
 	
-	@FindBy(name = "billsType")
+	@FindBy(xpath = "//div[contains(@class,'billsFrequencyTypeDiv')]//span[contains(text(),'Biz Days')]//preceding-sibling::input")
 	WebElement billsType;
 	
 	@FindBy(xpath = "//div[contains(@class,'billsFrequencyTypeDiv')]/label")
@@ -264,7 +264,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	}
 	
 	public void clickOnBizDays() {
-		bizDays.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", bizDays);
 	}
 	
 	public void clickOnWeekDays() {
@@ -327,8 +327,7 @@ public class ManageEmailAutomationPage extends BasePage {
 	}
 	
 	public String getSelectedBizDays() {
-		System.out.println(selectedBizDays.getAttribute("title"));
-		return selectedBizDays.getAttribute("title").replace(" ", "");
+		return bizDayDropdown.getAttribute("title").replace(" ", "");
 	}
 	
 	public String getCheckedFrequency() {
@@ -355,10 +354,16 @@ public class ManageEmailAutomationPage extends BasePage {
 	public boolean checkAuditLog(String date, String field, String value) {
 		try {
 			for(int i=0; i<auditedDates.size(); i++) {
+				System.out.println(auditedDates.get(i).getText().trim());
+				System.out.println(date);
 				if(auditedDates.get(i).getText().trim().contains(date)) {
 					 for(int j=0; i< fieldNames.size(); j++) {
+						 System.out.println(fieldNames.get(j).getText().trim());
+							System.out.println(field);
 						if(fieldNames.get(j).getText().trim().contains(field)) {
 						  WebElement newValue = driver.findElement(By.xpath("//table[@id='emailEditLogsTable']//tbody//tr[" + (j+1) + "]//td[3]"));
+						  System.out.println(newValue.getText().trim());
+							System.out.println(value);
 						  if (newValue.getText().trim().equals(value)) {
 							  return true;
 							}
