@@ -62,6 +62,9 @@ public class HomePage extends BasePage {
 	@FindBy(xpath = "//ul[contains(@class,'header-profile-dropdown-menu')]//li//span[contains(text(),'Sign Out')]")
 	WebElement signout;
 	
+	@FindBy(xpath = "//ul[contains(@class,'header-profile-dropdown-menu')]//li//span[contains(text(),'Profile Settings')]")
+	WebElement profileSettings;
+	
 	@FindBy(xpath = "//ul[contains(@class,'header-profile-dropdown-menu')]")
 	WebElement profileDropdown;
 	
@@ -197,6 +200,18 @@ public class HomePage extends BasePage {
 	
 	public String getLoggedInUsername() {
 		return loggedInUsername.getText();
+	}
+	
+	public boolean isProfileSettingsExist() {
+		return isElementPresent(profileSettings,30);
+	}
+	
+	public boolean isSignoutExist() {
+		return isElementPresent(signout,30);
+	}
+	
+	public void clickOnProfileSettings() {
+		profileSettings.click();
 	}
 	
 }

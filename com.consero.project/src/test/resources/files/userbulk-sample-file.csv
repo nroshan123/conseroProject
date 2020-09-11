@@ -1,0 +1,5 @@
+UserName,FirstName,LastName,SkypeUserName,AddressLineOne,AddressLineTwo,City,State,Zip,ActivitiesEmailNotification,BillDotComApprovalEmailNotification,ExpenseEmailNotification,TimesheetEmailNotification,EnableBillDotComNotification,EnableNexoniaNotification,EnableIntacctNotification,EnableSimon
+username001@gmail.com,Abcname,Abclastname,abcskype,2715 High street,Block no 22,Dreamcity,NVV,89109,For Every Activity,For Every Bill,For Every Expense,For Every Timesheet and Daily Summary,TRUE,FALSE,TRUE,FALSE
+username002@gmail.com,Xyxname,Xyzlastname,xyzskype,1622 High Land,Block No 21,Dreamcity,NV,89109,For Every Activity and Daily Summary,Daily Summary,For Every Expense and Daily Summary,For Every Timesheet,TRUE,FALSE,TRUE,FALSE
+username003@gmail.com,Pqrname,Pqrlastname,Pqrskype,1621 High Land,Block No 21,Dreamcity11,MH,89107,Daily Summary,For Every Bill and Daily Summary,Daily Summary,Daily Summary,TRUE,FALSE,TRUE,FALSE
+username004@gmail.com,Lmnname,Lmnlastname,Lmnrskype,1629 High Land,Block No 27,Dreamcity11,MH,89107,None,None,None,None,TRUE,FALSE,TRUE,FALSE

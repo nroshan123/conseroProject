@@ -16,6 +16,9 @@ public class TemplateDetailsPage extends BasePage{
 	@FindBy(xpath = "//span[@class='alert-warning']")
 	WebElement warning;
 	
+	@FindBy(xpath = " //span[contains(text(),'Please add the corrected close template')]")
+	WebElement correctTemplateMessage;
+
 	@FindBy(xpath = "//span[@class='alert-success']")
 	WebElement success;
 	
@@ -67,6 +70,10 @@ public class TemplateDetailsPage extends BasePage{
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean isCorrectTemplateMessageExist() {
+		return isElementPresent(correctTemplateMessage, 30);
 	}
 	
 	public boolean isTemplateValidated(String msg) {

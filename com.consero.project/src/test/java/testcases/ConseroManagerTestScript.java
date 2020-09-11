@@ -24,6 +24,7 @@ import pageclass.ActivityListPage;
 import pageclass.DashboardPage;
 import pageclass.HomePage;
 import pageclass.LoginPage;
+import pageclass.MyProfilePage;
 import pageclass.RecurranceManagementPage;
 import pageclass.UploadActivityTemplatePage;
 import pageclass.WorkloadPage;
@@ -1139,9 +1140,6 @@ public class ConseroManagerTestScript extends BaseTest {
 				test.log(LogStatus.PASS, "workload Chart is displayed!!");
 			}
 			takeScreenshot();
-			
-			
-			
 		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful to verify workload. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();

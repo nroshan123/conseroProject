@@ -64,7 +64,7 @@ public class ConseroAdminTestScript extends BaseTest {
 	
 	String sheetName = "credentials";
 	String adminUser = "", adminPassword = "", adminUsername = "";
-	String companyName= "automation_test_company_TLq", username ="", emailTemplateName="";
+	String companyName= "", username ="", emailTemplateName="";
 	
 	@BeforeMethod(alwaysRun = true)
 	public void setUp(Method method) {
@@ -188,9 +188,9 @@ public class ConseroAdminTestScript extends BaseTest {
 				} 
 				addUserPageObj.clickOnCreate();
 				} catch (Exception e) {
-					//addUserPageObj.clickOnBackToList();
+					addUserPageObj.clickOnBackToList();
 				}
-				sleep();
+				Thread.sleep(8000);
 				userListPageObj.setUserSearch(username);
 				if(userListPageObj.isUsereExist(username)) {
 					test.log(LogStatus.PASS, "user created successfully!!");
@@ -793,6 +793,13 @@ public class ConseroAdminTestScript extends BaseTest {
 				if(templateDetailsPageObj.isWarningExist()) {
 					test.log(LogStatus.INFO, "template not validated sucessfully " + templateDetailsPageObj.getWarning());
 				} 
+				
+				if(templateDetailsPageObj.isCorrectTemplateMessageExist()) {
+					templateDetailsPageObj.clickOnCompanyDetails();
+					if(basePage.isElementPresent(companyDetailsPageObj.companyDetailsHeader, 60)) {
+						test.log(LogStatus.INFO, "successfully Redirected to companyDeatils page.");
+					}
+				}
 				
 				if(templateDetailsPageObj.isTemplateValidated(successMessage)) {
 					test.log(LogStatus.PASS, "Template validated successfully!!");

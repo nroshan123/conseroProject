@@ -7,11 +7,11 @@
 
 	<parameter name="appurl" value="https://consero-prod-beta.azurewebsites.net/" />
 	
-	<test name="Test">
+	<!-- <test name="Test">
 		<classes>
 			<class name="testcases.ConseroAdminTestScript" />
 		</classes>
-	</test>
+	</test> -->
 	
 	<!-- <test name="Test1">
 		<classes>
@@ -19,4 +19,9 @@
 		</classes>
 	</test> -->
 	
+	<test name="profileSettings">
+		<classes>
+			<class name="testcases.ConseroProfileSettingsTestScript" />
+		</classes>
+	</test>
 </suite>

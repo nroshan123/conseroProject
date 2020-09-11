@@ -106,7 +106,7 @@ public class UsersListPage extends BasePage {
 	}
 	
 	public boolean isUsereExist(String name) {
-		if(isElementPresent(emptyUserTable,60)) {
+		if(isElementPresent(emptyUserTable,20)) {
 			return false;
 		} else {
 			for(WebElement username:usernameinTable) {
