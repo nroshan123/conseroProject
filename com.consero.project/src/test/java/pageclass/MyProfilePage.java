@@ -8,6 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import com.google.common.base.Strings;
+
 public class MyProfilePage extends BasePage {
 	WebDriver driver;
 
@@ -47,7 +49,7 @@ public class MyProfilePage extends BasePage {
 	@FindBy(id = "AddressLineOne")
 	WebElement addressOne;
 	
-	@FindBy(id = "AddressLineOne")
+	@FindBy(id = "AddressLineTwo")
 	WebElement addressTwo;
 	
 	@FindBy(id = "UserPhoto")
@@ -112,7 +114,7 @@ public class MyProfilePage extends BasePage {
 	@FindBy(id = "UserNameBillDotCom")
 	WebElement billUserName;
 	
-	@FindBy(id = "UserNameBillDotCom")
+	@FindBy(id = "PasswordBillDotCom")
 	WebElement billPassword;
 	
 	@FindBy(id = "verifyBillDotcomPassword")
@@ -124,10 +126,10 @@ public class MyProfilePage extends BasePage {
 	@FindBy(id = "collapseCredential")
 	WebElement collapseBillDotCom;
 	
-	@FindBy(id = "UserNameBillDotCom")
+	@FindBy(id = "NexoniaUsername")
 	WebElement nexoniaUserName;
 	
-	@FindBy(id = "UserNameBillDotCom")
+	@FindBy(id = "NexoniaPassword")
 	WebElement nexoniaPassword;
 	
 	@FindBy(id = "verifyNexoniaPassword")
@@ -232,7 +234,13 @@ public class MyProfilePage extends BasePage {
 	
 	public void setInformationDetails(String address1, String address2, String fileName) {
 		this.setuserPhoto(fileName);
+		if(!Strings.isNullOrEmpty(this.getAddress1())) {
+			addressOne.clear();
+		}
 		this.setAddressOne(address1);
+		if(!Strings.isNullOrEmpty(this.getAddress2())) {
+			addressTwo.clear();
+		}
 		this.setAddressTwo(address2);
 	}
 	

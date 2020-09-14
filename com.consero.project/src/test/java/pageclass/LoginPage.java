@@ -12,7 +12,7 @@ public class LoginPage extends BasePage {
 	@FindBy(xpath = "//div[@class='login-box-content']")
 	public WebElement loginDiv;
 	
-	@FindBy(id = "username")
+    @FindBy(id = "username")
 	WebElement username;
 	
 	@FindBy(id = "password")
@@ -20,6 +20,19 @@ public class LoginPage extends BasePage {
 	
 	@FindBy(id = "showOffWarningPopAfrLgin")
 	WebElement login;
+	
+
+	/*@FindBy(xpath = "//div[contains(@class,'login-container')]")
+	public WebElement loginDiv;
+	
+	@FindBy(xpath = "//input[@placeholder='Email ID']")
+	WebElement username;
+	
+	@FindBy(xpath = "//input[@placeholder='Password']")
+	WebElement password;
+	
+	@FindBy(xpath = "//button[contains(@class,'loginbtn')]")
+	WebElement login;*/
 	
 	public LoginPage(WebDriver driver) {
 		super(driver);

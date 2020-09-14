@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -74,7 +75,6 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 			test.log(LogStatus.INFO, "Navigated to url " + appUrl);
 			
 			loginPageObj.login(managerUsername, managerPassword);
-			
 			if(homePageObj.isLoggedInUsernameExist() && homePageObj.getLoggedInUsername().equals(managerName)) {
 				test.log(LogStatus.PASS, "Logged in successfully!!");
 			}
@@ -108,32 +108,77 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 	public void activityTC() {
 		homePageObj = new HomePage(driver);
 		activityListPageObj = new ActivityListPage(driver);
-		String activity = "Generate Validate and Review Financials";
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		
+		String activity = "Generate Validate and Review Financials",
+			   status = "Assigned";
 		try {
 			homePageObj.clickOnControlDock();
-			activityListPageObj.clickOnClientDropdown();
-			activityListPageObj.setSearchClient(companyName);
-			activityListPageObj.selectClient(companyName);
+			activityListPageObj.searchAndSelectClient(companyName);
+			Assert.assertTrue(activityListPageObj.isClientSelected(companyName));
+			test.log(LogStatus.INFO, companyName + " Client Selected!!");
+			sleep();
 			activityListPageObj.setSearch(activity);
-			activityListPageObj.clickOnActivityDetails();
+			if(activityListPageObj.clickOnAssignedActivity(status)) {
+				test.log(LogStatus.INFO,  " Assigned Activity is present in activity list!!");
+			} else {
+				activityListPageObj.clickOnActivityDetails();
+			}
 			
-		}catch(Exception e) {
+			if(activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
+				test.log(LogStatus.INFO,  " Activity is Assigned to logged in user!!");
+				if(activityDetailsPageObj.isGenerateFinancialsButtonExist()) {
+					test.log(LogStatus.PASS,  " 'Generate Financial' button is available for Owner!");
+				} else {
+					test.log(LogStatus.FAIL,  " 'Generate Financial' button is not available for Owner!");
+				}
+			} else {
+				test.log(LogStatus.INFO,  " Activity is  not Assigned to logged in user!!");
+				if(!activityDetailsPageObj.isGenerateFinancialsButtonExist()) {
+					test.log(LogStatus.PASS,  " 'Generate Financial' button is not Available as activity is not assigned to ownwer!");
+				} else {
+					test.log(LogStatus.FAIL,  " 'Generate Financial' button is available as activity is not assigned to ownwer!");
+				}
+				activityDetailsPageObj.clickOnAssignToLevel();
+				activityDetailsPageObj.selectAssignee(managerName);
+				activityDetailsPageObj.clickOnSaveAssignedTo();
+				String assignee = activityDetailsPageObj.getAssignToLevel();
+				if (assignee.equals(managerName)) {
+					test.log(LogStatus.PASS, "assigned Activity to logged in user successfully!!!!");
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority = 3)
+	public void generateActivityTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		String content = "Standard Reports Generation is In Progress";
+		try {
+			if (activityDetailsPageObj.getStatus().equals("Assigned")) {
+				if(activityDetailsPageObj.isGenerateFinancialsButtonExist()) {
+					test.log(LogStatus.INFO,  " 'Generate Financial' button is available!!");
+					activityDetailsPageObj.clickOnGenerateFinancials();
+					if(activityDetailsPageObj.isFinancialReportStatusModalExist(content)) {
+						test.log(LogStatus.INFO,  "Financial Report Status Modal opened suceessfully!!");
+						activityDetailsPageObj.clickOnCloseFinancialReportStatusModal();
+					}
+				}
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Test(priority=3)
-	public void activityTC1() {
+	public void viewActivityTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		try {
-			
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test(priority=3)
-	public void activityTC2() {
-		try {
+			activityDetailsPageObj.clickOnViewFinancials();
+			Assert.assertTrue(activityDetailsPageObj.isViewFinancialPageTitleExist());
+			test.log(LogStatus.INFO,  "'view Financial' page opened sucessfully!!");
 			
 		}catch(Exception e) {
 			e.printStackTrace();

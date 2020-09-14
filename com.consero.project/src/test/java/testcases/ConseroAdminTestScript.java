@@ -85,7 +85,7 @@ public class ConseroAdminTestScript extends BaseTest {
 		try {
 			List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
 			for (int i = 0; i < TCData.size(); i++) {
-				if(TCData.get(i).get("role").equals("admin")) {
+				if(TCData.get(i).get("role").equals("user")) {
 					adminUser = TCData.get(i).get("email");
 					adminPassword = TCData.get(i).get("password");
 					adminUsername =  TCData.get(i).get("username");

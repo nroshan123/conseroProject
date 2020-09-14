@@ -14,6 +14,8 @@ public class HomePage extends BasePage {
 
 	WebDriver driver;
 
+	//@FindBy(xpath = "//img[contains(@class,'company-logo')]")
+	
 	@FindBy(xpath = "//img[@class='company_logo']")
 	public WebElement companyLogo;
 	

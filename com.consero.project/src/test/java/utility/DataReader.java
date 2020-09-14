@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 
 public class DataReader {
 	public static String TestDataFileName = System.getProperty("user.dir") + "\\src\\test\\resources\\testdata\\credential.xlsx";
@@ -18,6 +19,7 @@ public class DataReader {
 	public static XSSFSheet sheet;
 	private static Cell cell;
 	private static Row row;
+	private static MissingCellPolicy xRow;
 	
 	//Row Number
     public static int rowNumber;
@@ -73,7 +75,7 @@ public class DataReader {
 	public static void setCellData(String value, int RowNum, int ColNum) {
         try {
 			row = sheet.getRow(RowNum);
-			cell = row.getCell(ColNum);
+			cell = row.getCell(ColNum, MissingCellPolicy.RETURN_BLANK_AS_NULL);
 			if (cell == null) {
 				cell = row.createCell(ColNum);
 				cell.setCellValue(value);

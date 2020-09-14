@@ -169,8 +169,23 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(id = "viewFinancials")
 	WebElement viewFinancials;
 	
+	@FindBy(id = "generateFinancials")
+	WebElement generateFinancials;
+	
 	@FindBy(xpath = "//a[contains(text(),'COA Validations')]")
 	WebElement coaValidation;
+	
+	@FindBy(id = "closeCMSFinancialReportStatusModal")
+	WebElement closeFinancialReportStatusModal;
+	
+	@FindBy(xpath= "//div[@id='showCMSFinancialReportStatus']//div[@id='announcementModalContent']")
+	WebElement financialReportStatusModal;
+	
+	@FindBy(xpath= "//div[@id='showCMSFinancialReportStatus']//div[@id='announcementModalContent']//span[@class='financialReportStatusMsg']")
+	WebElement financialReportStatusMsg;
+	
+	@FindBy(xpath= "//div[@id='cmsActivityFinancialHeader']//h4[contains(text(),'Generate Validate and Review Financials')]")
+	WebElement viewFinancialPageTitle;
 	
 	public ActivityDetailsPage(WebDriver driver) {
 		super(driver);
@@ -459,5 +474,38 @@ public class ActivityDetailsPage extends BasePage {
 	public void clickOnCoaValidation() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", coaValidation);
 	}
+	
+	public void clickOnGenerateFinancials() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", generateFinancials);
+	}
+	
+	public boolean isCompleteValidationButtonExist() {
+		return isElementPresent(completeValidation, 30);
+	}
+	
+	public boolean isGenerateFinancialsButtonExist() {
+		return isElementPresent(generateFinancials, 30);
+	}
+	
+	public String getFinancialReportStatusMsg() {
+		return financialReportStatusMsg.getText();
+	}
+	
+	public boolean isFinancialReportStatusModalExist(String content) {
+		if(isElementPresent(financialReportStatusModal, 30) && this.getFinancialReportStatusMsg().contains(content)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void clickOnCloseFinancialReportStatusModal() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", closeFinancialReportStatusModal);
+	}
+	
+	public boolean isViewFinancialPageTitleExist() {
+		return isElementPresent(viewFinancialPageTitle, 30);
+	}
+	
+	
 	
 }

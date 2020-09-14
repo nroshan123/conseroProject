@@ -50,21 +50,20 @@ public class ConseroProfileSettingsTestScript extends BaseTest {
 	@Parameters({"appurl" })
 	@Test
 	public void loginTC(String appUrl) {
+		loginPageObj = new LoginPage(driver);
 		try {
-			System.out.println(appUrl);
 			List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
 			for (int i = 0; i < TCData.size(); i++) {
 				if(TCData.get(i).get("role").equals("profileSettings")) {
 					userEmail = TCData.get(i).get("email");
 					password = TCData.get(i).get("password");
-					username = TCData.get(i).get("password");
+					username = TCData.get(i).get("username");
 				}
 			}
 			loadConfig();
 			test.log(LogStatus.INFO, "Loading config file");
 			navigate(appUrl);
 			test.log(LogStatus.INFO, "Navigated to url " + appUrl);
-			loginPageObj = new LoginPage(driver);
 			loginPageObj.login(userEmail, password);
 			
 			test.log(LogStatus.PASS, "Logged in successfully!!");
@@ -195,8 +194,9 @@ public class ConseroProfileSettingsTestScript extends BaseTest {
 			test.log(LogStatus.INFO, "redirected to " + profileTitle + " sucessfully!!");
 			myProfilePageObj.setChangePasswordDetails(password, newPassword, newPassword);
 			if(basePage.checkSuccessMessage(successMessage)) {
-				test.log(LogStatus.PASS, "success message recieved and password updated successfully");
-				DataReader.setCellData(newPassword, 5, 4);
+				test.log(LogStatus.PASS, "success message recieved and password updated successfully !!! Updated password is - " + newPassword);
+				System.out.println(newPassword);
+				DataReader.setCellData(newPassword, 4, 3);
 			} else {
 				test.log(LogStatus.FAIL, "Failed to update password");
 			}
@@ -269,8 +269,7 @@ public class ConseroProfileSettingsTestScript extends BaseTest {
 	@Test(priority = 8)
 	public void assignedRolesTC() {
 		myProfilePageObj = new MyProfilePage(driver);
-		String profileTitle = "Assigned Company Roles",
-			   successMessage = "Your Profile is updated.";
+		String profileTitle = "Assigned Company Roles";
 		try {
 			myProfilePageObj.clickOnAssignedRoles();
 			Assert.assertTrue(myProfilePageObj.getProfileTitle().equals(profileTitle));
@@ -295,6 +294,7 @@ public class ConseroProfileSettingsTestScript extends BaseTest {
 			if(myProfilePageObj.isBillCredentialPanelDisplayed()) {
 				test.log(LogStatus.INFO, "Bill.com credential panel is displayed successfully!!");
 				myProfilePageObj.setBillCredentials(username, password);
+				sleep();
 				if(myProfilePageObj.isBillPasswordErrorMsgExist()) {
 					test.log(LogStatus.FAIL, "Failed to verify Bill.com password!!! Displayed error msg - " + myProfilePageObj.getBillPasswordErrorMsg());
 				}
@@ -305,12 +305,13 @@ public class ConseroProfileSettingsTestScript extends BaseTest {
 			
 			if(myProfilePageObj.isNexoniaCredentialPanelDisplayed()) {
 				test.log(LogStatus.INFO, "Nexonia credential panel is displayed successfully!!");
-				if(myProfilePageObj.isNexoniaCollapsed()) {
+				if(!myProfilePageObj.isNexoniaCollapsed()) {
 					test.log(LogStatus.INFO, "Nexonia credentials is collapsed!!");
 					myProfilePageObj.clickOnNexoniaCollapseButton();
 					Assert.assertFalse(myProfilePageObj.isNexoniaCollapsed());
 					test.log(LogStatus.INFO, "Nexonia credentials displayed successfully!!");
 					myProfilePageObj.setNexoniaCredentials(username, password);
+					sleep();
 					if(myProfilePageObj.isNexoniaPasswordErrorMsgExist()) {
 						test.log(LogStatus.FAIL, "Failed to verify Nexonia password!!! Displayed error msg - " + myProfilePageObj.getNexoniaPasswordErrorMsg());
 					}

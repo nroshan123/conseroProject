@@ -13,7 +13,7 @@ public class UsersListPage extends BasePage {
 	
 	WebDriver driver;
 
-	@FindBy(xpath = "//*[@class='page-title' and contains(text(),'Users')]")
+    @FindBy(xpath = "//*[@class='page-title' and contains(text(),'Users')]")
 	public WebElement pageTitle;
 	
 	@FindBy(id = "userSearch")

@@ -114,6 +114,15 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//td[@class='activitySelectedClient']//ul[contains(@class,'dropdown-menu')]//li")
 	List<WebElement> clientOptions;
 	
+	@FindBy(xpath = "//select[@id='SelectedClient']//following-sibling::div/ul//li[contains(@class,'multiselect-all')]")
+	WebElement selectAllClient;
+	
+	@FindBy(xpath = "//select[@id='SelectedClient']//following-sibling::div/button[contains(@class,'dropdown-toggle')]//span[@class='multiselect-selected-text']")
+	WebElement selectedClient;
+	
+	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td[5]")
+	List<WebElement> clientStatus;
+	
 	public ActivityListPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -307,4 +316,43 @@ public class ActivityListPage extends BasePage{
 			}
 		}
 	}
+	
+	public String getSelectedClient() {
+		return selectedClient.getText();
+	}
+	
+	public void clickOnSelectAllClient() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", selectAllClient);
+	}
+	
+	public void searchAndSelectClient(String client) {
+		try {
+			this.clickOnClientDropdown();
+			this.clickOnSelectAllClient();
+			this.clickOnSelectAllClient();
+			this.setSearchClient(client);
+			this.selectClient(client);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isClientSelected(String client) {
+		if(this.getSelectedClient().equals(client)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean clickOnAssignedActivity(String value) {
+		for(int i=0; i<clientStatus.size(); i++) {
+			if(clientStatus.get(i).getText().equals(value)) {
+				WebElement activity = driver.findElement(By.xpath("//table[@id='activitiesTable']//tbody//tr["+(i+1)+"]//td[4]"));
+				((JavascriptExecutor) driver).executeScript("arguments[0].click()", activity);
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }
