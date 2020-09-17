@@ -123,6 +123,9 @@ public class ActivityListPage extends BasePage{
 	@FindBy(xpath = "//table[@id='activitiesTable']//tbody//tr//td[5]")
 	List<WebElement> clientStatus;
 	
+	@FindBy(id = "filterClientActivities")
+	WebElement filterClientActivities;
+	
 	public ActivityListPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -344,15 +347,19 @@ public class ActivityListPage extends BasePage{
 		return false;
 	}
 	
-	public boolean clickOnAssignedActivity(String value) {
+	public boolean clickOnActivity(String status) {
 		for(int i=0; i<clientStatus.size(); i++) {
-			if(clientStatus.get(i).getText().equals(value)) {
+			if(clientStatus.get(i).getText().equals(status)) {
 				WebElement activity = driver.findElement(By.xpath("//table[@id='activitiesTable']//tbody//tr["+(i+1)+"]//td[4]"));
 				((JavascriptExecutor) driver).executeScript("arguments[0].click()", activity);
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public void clickOnFilterClientActivities() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", filterClientActivities);
 	}
 	
 }

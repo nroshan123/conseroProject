@@ -7,6 +7,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 public class ViewFinancialPage extends BasePage {
+	
+	@FindBy(xpath= "//div[@id='cmsActivityFinancialHeader']//h4[contains(text(),'Generate Validate and Review Financials')]")
+	WebElement viewFinancialPageTitle;
 
 	@FindBy(xpath = "//button[text()='Verify Path for GDrive']")
 	WebElement verifyPathForGDrive;
@@ -35,12 +38,36 @@ public class ViewFinancialPage extends BasePage {
 	@FindBy(xpath = "//div[@id='GDriveErrorBox']//a[text()='OK']")
 	WebElement acceptGdriveModal;
 	
-	//span[contains(text(),'Highlights')]
+	@FindBy(id = "financialValidationLi")
+	WebElement validationSummaryTab;
+	
+	@FindBy(id = "intacctTotalErrorCount")
+	WebElement intacctTotalErrorCount;
+	
+	@FindBy(id = "reportValTotalErrorCount")
+	WebElement reportTotalErrorCount;
+	
+	@FindBy(id = "totalValidationErrorCount")
+	WebElement totalValidationErrorCount;
+	
+	@FindBy(id = "CompleteValidation")
+	WebElement completeValidation;
+	
+	@FindBy(id = "SubmitDraft")
+	WebElement submitDraft;
+	
+	@FindBy(id = "RejectSubmitDraft")
+	WebElement reject;
+	
 	
 	public ViewFinancialPage(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
+	}
+	
+	public boolean isViewFinancialPageTitleExist() {
+		return isElementPresent(viewFinancialPageTitle, 30);
 	}
 	
 	public void clickOnActivityDetail() {
@@ -49,6 +76,22 @@ public class ViewFinancialPage extends BasePage {
 	
 	public void clickOnVerifyPathForGDrive() {
 		verifyPathForGDrive.click();
+	}
+	
+	public boolean isVerifyPathForGDriveExist() {
+		return isElementPresent(verifyPathForGDrive, 30);
+	}
+	
+	public boolean isGDrivePathErrorExist() {
+		return isElementPresent(gDrivePathError,30);
+	}
+	
+	public String getGDrivePathError() {
+		return gDrivePathError.getText();
+	}
+	
+	public void clickOnAcceptGdriveModal() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", acceptGdriveModal);
 	}
 	
 	public void clickOnRegenerateFinancial() {
@@ -67,6 +110,13 @@ public class ViewFinancialPage extends BasePage {
 		reportValidation.click();
 	}
 	
+	public boolean isValidationButtonExist() {
+		if(isElementPresent(intacctValidation,30) && isElementPresent(reportValidation,30)) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean isgDriveModalExist() {
 		return isElementPresent(gDriveModal, 30);
 	}
@@ -75,8 +125,55 @@ public class ViewFinancialPage extends BasePage {
 		return gDrivePathError.getText();
 	}
 	
-	public boolean isgDriveErrorExist(String msg) {
-		if(isElementPresent(gDrivePathError, 30) && this.getErrorMsg().equals(msg)) {
+	public boolean isValidationSummaryTabSelected()  {
+		if(validationSummaryTab.getAttribute("class").equals("active")) {
+			return true;
+		}
+		return false;
+	}
+	
+	public String getIntacctTotalErrorCount() {
+		return intacctTotalErrorCount.getText();
+	}
+	
+	public String getReportTotalErrorCount() {
+		return reportTotalErrorCount.getText();
+	}
+	
+	public String getTotalValidationErrorCount() {
+		return totalValidationErrorCount.getText();
+	}
+	
+	public boolean isCompleteValidationEnabled() {
+		return completeValidation.isEnabled();
+	}
+	
+	public boolean isCompleteValidationButtonExist() {
+		return isElementPresent(completeValidation,30);
+	}
+	
+	public void clickOnCompleteValidation() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", completeValidation);
+	}
+	
+	public void clickOnSubmitDraft() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", submitDraft);
+	}
+	
+	public void clickOnReject() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", reject);
+	}
+	
+	public boolean isRejectButtonExist() {
+		return isElementPresent(reject, 30);
+	}
+	
+	public boolean isSubmitDraftButtonExist() {
+		return isElementPresent(submitDraft, 30);
+	}
+	
+	public boolean isValidateFinancialButtonExist() {
+		if(this.isVerifyPathForGDriveExist() && isElementPresent(regenerateFinancial,30) && isElementPresent(completeValidation,30)) {
 			return true;
 		}
 		return false;

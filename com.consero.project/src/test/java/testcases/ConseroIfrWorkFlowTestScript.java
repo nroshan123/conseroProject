@@ -23,6 +23,7 @@ import pageclass.HomePage;
 import pageclass.LoginPage;
 import pageclass.RecurranceManagementPage;
 import pageclass.UploadActivityTemplatePage;
+import pageclass.ViewFinancialPage;
 import pageclass.WorkloadPage;
 import utility.DataReader;
 import utility.ExtentTestManager;
@@ -40,6 +41,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 	UploadActivityTemplatePage activityTemplatePageObj = null;
 	RecurranceManagementPage recurranceManagementPageObj = null;
 	WorkloadPage workloadPageObj = null;
+	ViewFinancialPage viewFinancialPageObj = null;
 
 	String sheetName = "credentials";
 	String managerUsername = "", managerPassword = "", managerName = "";
@@ -105,7 +107,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 	}
 	
 	@Test(priority=2)
-	public void activityTC() {
+	public void generateAndReviewFinancialActivityTC() {
 		homePageObj = new HomePage(driver);
 		activityListPageObj = new ActivityListPage(driver);
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
@@ -115,11 +117,12 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		try {
 			homePageObj.clickOnControlDock();
 			activityListPageObj.searchAndSelectClient(companyName);
+			activityListPageObj.clickOnFilterClientActivities();
 			Assert.assertTrue(activityListPageObj.isClientSelected(companyName));
 			test.log(LogStatus.INFO, companyName + " Client Selected!!");
-			sleep();
+			Thread.sleep(5000);
 			activityListPageObj.setSearch(activity);
-			if(activityListPageObj.clickOnAssignedActivity(status)) {
+			if(activityListPageObj.clickOnActivity(status)) {
 				test.log(LogStatus.INFO,  " Assigned Activity is present in activity list!!");
 			} else {
 				activityListPageObj.clickOnActivityDetails();
@@ -132,6 +135,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 				} else {
 					test.log(LogStatus.FAIL,  " 'Generate Financial' button is not available for Owner!");
 				}
+				takeScreenshot();
 			} else {
 				test.log(LogStatus.INFO,  " Activity is  not Assigned to logged in user!!");
 				if(!activityDetailsPageObj.isGenerateFinancialsButtonExist()) {
@@ -147,17 +151,19 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 					test.log(LogStatus.PASS, "assigned Activity to logged in user successfully!!!!");
 				}
 			}
+			takeScreenshot();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Test(priority = 3)
-	public void generateActivityTC() {
+	public void generateFinancialTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		String content = "Standard Reports Generation is In Progress";
 		try {
 			if (activityDetailsPageObj.getStatus().equals("Assigned")) {
+				test.log(LogStatus.INFO,  " staus is 'Assigned'!!");
 				if(activityDetailsPageObj.isGenerateFinancialsButtonExist()) {
 					test.log(LogStatus.INFO,  " 'Generate Financial' button is available!!");
 					activityDetailsPageObj.clickOnGenerateFinancials();
@@ -166,22 +172,211 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 						activityDetailsPageObj.clickOnCloseFinancialReportStatusModal();
 					}
 				}
+			} else {
+				test.log(LogStatus.INFO,  " staus is  not 'Assigned'!!");
+				activityDetailsPageObj.clickOnBackToActivities();
+				if(activityListPageObj.isActivityTableExist()) {
+					test.log(LogStatus.INFO,  "Activity list is Empty!!");
+				} else {
+					test.log(LogStatus.INFO,  "Activity list loaded successfully!!");
+				}
 			}
+			takeScreenshot();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Test(priority=3)
-	public void viewActivityTC() {
+	@Test(priority=4)
+	public void viewFinancialTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String status = "In Progress",
+			   intacctErrorCount = "",
+			   reportErrorCount = "",
+			   totalErrorCount = "";
 		try {
-			activityDetailsPageObj.clickOnViewFinancials();
-			Assert.assertTrue(activityDetailsPageObj.isViewFinancialPageTitleExist());
-			test.log(LogStatus.INFO,  "'view Financial' page opened sucessfully!!");
-			
-		}catch(Exception e) {
+			if(activityListPageObj.clickOnActivity(status)) {
+				test.log(LogStatus.INFO, status+ " Activity is present in activity list!!");
+				activityDetailsPageObj.clickOnViewFinancials();
+				Assert.assertTrue(viewFinancialPageObj.isViewFinancialPageTitleExist());
+				test.log(LogStatus.INFO,  "'view Financial' page opened sucessfully!!");
+				if(viewFinancialPageObj.isValidationSummaryTabSelected()) {
+					test.log(LogStatus.PASS,  "'validation summary' tab is selected by default!!");
+				} else {
+					test.log(LogStatus.FAIL,  "'validation summary' tab is not selected by default!!");
+				}
+				
+				if(viewFinancialPageObj.isVerifyPathForGDriveExist()) {
+					viewFinancialPageObj.clickOnVerifyPathForGDrive();
+					if(viewFinancialPageObj.isGDrivePathErrorExist()) {
+						test.log(LogStatus.FAIL,  "Getting error in GDrive path - " + viewFinancialPageObj.getGDrivePathError());
+						viewFinancialPageObj.clickOnAcceptGdriveModal();
+					}
+				}
+				takeScreenshot();
+				if(viewFinancialPageObj.isValidationButtonExist()) {
+					test.log(LogStatus.INFO,  "'Intacct validation' and 'Report validation' button is present!!");
+					viewFinancialPageObj.clickOnIntacctValidation();
+					sleep();
+					intacctErrorCount = viewFinancialPageObj.getIntacctTotalErrorCount();
+					test.log(LogStatus.INFO,  "Intact Validation Error Count : " + intacctErrorCount);
+					
+					viewFinancialPageObj.clickOnReportValidation();
+					sleep();
+					reportErrorCount = viewFinancialPageObj.getReportTotalErrorCount();
+					test.log(LogStatus.INFO,  "Report Validation Error Count : " + reportErrorCount);
+					
+					totalErrorCount = viewFinancialPageObj.getTotalValidationErrorCount();
+					test.log(LogStatus.INFO,  "Total Validation Error Count : " + totalErrorCount);
+					int totalValidationError = Integer.parseInt(totalErrorCount);
+					
+					if(totalValidationError > 0 && !viewFinancialPageObj.isCompleteValidationEnabled()) {
+						test.log(LogStatus.INFO,  "Total Validation Error Count is : " + totalValidationError + "Complete Validation button is disabled!!!");
+					} else if(totalValidationError == 0 && viewFinancialPageObj.isCompleteValidationEnabled()) {
+						test.log(LogStatus.INFO,  "Total Validation Error Count is : " + totalValidationError + "Complete Validation button is enabled!!!");
+					}
+				}
+			} else {
+				test.log(LogStatus.INFO, status+ " Activity is not present in activity list!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test(priority=5)
+	public void completeFinancialTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		try {
+			int totalValidationError = Integer.parseInt(viewFinancialPageObj.getTotalValidationErrorCount());
+			if(totalValidationError > 0 && !viewFinancialPageObj.isCompleteValidationEnabled()) {
+				test.log(LogStatus.INFO,  "Total Validation Error Count is : " + totalValidationError + "Complete Validation button is disabled!!!");
+				viewFinancialPageObj.clickOnActivityDetail();
+				Assert.assertTrue(activityDetailsPageObj.isCompleteValidationButtonExist());
+				activityDetailsPageObj.clickOnCompleteValidation();
+			} else if(totalValidationError == 0 && viewFinancialPageObj.isCompleteValidationEnabled()) {
+				test.log(LogStatus.INFO,  "Total Validation Error Count is : " + totalValidationError + "Complete Validation button is enabled!!!");
+				viewFinancialPageObj.clickOnCompleteValidation();
+			}
+			
+			if(activityDetailsPageObj.getStatus().equals("In Review")) {
+				test.log(LogStatus.PASS,  "Financial Completed successfully!!!");
+			} else {
+				test.log(LogStatus.FAIL,  "Failed to Complete Financial!!!");
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=6)
+	public void reviewFinancialTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String status = "In Review";
+		try {
+			this.reviewFinacial(status);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=7)
+	public void rejectFinancialTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String note = generateRandomString(5),
+			   status = "In Progress",
+			   successMsg = "Draft Submitted Successfully for Stage : ReviewOne";
+		try {
+			Assert.assertTrue(viewFinancialPageObj.isRejectButtonExist());
+			viewFinancialPageObj.clickOnReject();
+			if(activityDetailsPageObj.isAddNotePopoverExist()) {
+				activityDetailsPageObj.setRejectNote(note);
+				activityDetailsPageObj.clickOnReject();
+			}
+			
+			if(viewFinancialPageObj.isValidateFinancialButtonExist()) {
+				test.log(LogStatus.INFO,  "'Verify Path for GDrive', 'Re-Generate Financials' and 'complete Financial' button is exist on view financial after rejection'!!" );
+			} else {
+				test.log(LogStatus.INFO,  "'Verify Path for GDrive', 'Re-Generate Financials' and 'complete Financial' button doesn't exist. It Should exist on view financial after rejection'!!" );
+			}
+			takeScreenshot();
+			
+			viewFinancialPageObj.clickOnActivityDetail();
+			sleep();
+			if(activityDetailsPageObj.getStatus().equals(status)) {
+				test.log(LogStatus.PASS, "Financial rejected successfully!!!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to reject financial!!!!");
+			}
+			takeScreenshot();
+			
+			if(activityDetailsPageObj.isCompleteValidationButtonExist()) {
+				activityDetailsPageObj.clickOnCompleteValidation();
+				if(basePage.checkSuccessMessage(successMsg)) {
+					test.log(LogStatus.INFO, "success msg recieved - " + successMsg);
+				}
+				if(activityDetailsPageObj.getStatus().equals("In Review")) {
+					test.log(LogStatus.INFO, "completed Financial again after rejection!!");
+				}
+			}
+			takeScreenshot();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=7)
+	public void submitForDraftFinancialTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String status = "In Review",
+			   successMsg = "Draft Submitted Successfully for Stage : ReviewOne";
+		try {
+			this.reviewFinacial(status);
+			if(viewFinancialPageObj.isSubmitDraftButtonExist()) {
+				viewFinancialPageObj.clickOnSubmitDraft();
+				sleep();
+				if(basePage.checkSuccessMessage(successMsg)) {
+					test.log(LogStatus.INFO, "success message recieved successfully - " + successMsg);
+				}
+				
+				if(activityDetailsPageObj.getStatus().equals("Complete")) {
+					test.log(LogStatus.PASS, "Financial Completed successfully!!!!");
+				} else {
+					test.log(LogStatus.FAIL, "Failed to complete financial!!!!");
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void reviewFinacial(String status) {
+		Assert.assertTrue(activityDetailsPageObj.getStatus().equals(status));
+		if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
+			test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
+		} else {
+			test.log(LogStatus.INFO, " Activity is not Assigned to logged in user for review!!");
+			activityDetailsPageObj.mousehoverOnViewFinancial();
+			if (activityDetailsPageObj.isViewFinancialNotVisible()) {
+				test.log(LogStatus.INFO, "view financial is disable for other users!!");
+			}
+			takeScreenshot();
+			activityDetailsPageObj.clickOnAssignToLevel();
+			activityDetailsPageObj.selectAssignee(managerName);
+			activityDetailsPageObj.clickOnSaveAssignedTo();
+			String assignee = activityDetailsPageObj.getAssignToLevel();
+			if (assignee.equals(managerName)) {
+				test.log(LogStatus.PASS, "assigned Activity to logged in user for review successfully!!!!");
+			}
+		}
+		takeScreenshot();
+		activityDetailsPageObj.clickOnViewFinancials();
 	}
 }

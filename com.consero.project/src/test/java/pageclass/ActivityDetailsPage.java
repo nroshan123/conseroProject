@@ -7,6 +7,7 @@ import java.util.List;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
@@ -169,6 +170,9 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(id = "viewFinancials")
 	WebElement viewFinancials;
 	
+	@FindBy(xpath = "//a[contains(text(),'View Financials')]")
+	WebElement viewFinancial;
+	
 	@FindBy(id = "generateFinancials")
 	WebElement generateFinancials;
 	
@@ -184,8 +188,11 @@ public class ActivityDetailsPage extends BasePage {
 	@FindBy(xpath= "//div[@id='showCMSFinancialReportStatus']//div[@id='announcementModalContent']//span[@class='financialReportStatusMsg']")
 	WebElement financialReportStatusMsg;
 	
-	@FindBy(xpath= "//div[@id='cmsActivityFinancialHeader']//h4[contains(text(),'Generate Validate and Review Financials')]")
-	WebElement viewFinancialPageTitle;
+	@FindBy(id = "rejectTextBox")
+	WebElement rejectNote;
+	
+	@FindBy(xpath = "//div[@class='popover-content']//button[text()='Reject']")
+	WebElement reject;
 	
 	public ActivityDetailsPage(WebDriver driver) {
 		super(driver);
@@ -480,7 +487,7 @@ public class ActivityDetailsPage extends BasePage {
 	}
 	
 	public boolean isCompleteValidationButtonExist() {
-		return isElementPresent(completeValidation, 30);
+		return isElementPresent(completeValidation, 60);
 	}
 	
 	public boolean isGenerateFinancialsButtonExist() {
@@ -502,10 +509,24 @@ public class ActivityDetailsPage extends BasePage {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", closeFinancialReportStatusModal);
 	}
 	
-	public boolean isViewFinancialPageTitleExist() {
-		return isElementPresent(viewFinancialPageTitle, 30);
+	public void mousehoverOnViewFinancial() {
+		Actions actions = new Actions(driver);
+		actions.moveToElement(viewFinancial).perform();
 	}
 	
+	public boolean isViewFinancialNotVisible() {
+		if(viewFinancial.getAttribute("data-tooltip-text").equals("Visible only to the owner of the activity.")) {
+			return true;
+		}
+		return false;
+	}
 	
+	public void setRejectNote(String note) {
+		rejectNote.sendKeys(note);
+	}
+	
+	public void clickOnReject() {
+		reject.click();
+	}
 	
 }
