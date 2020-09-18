@@ -105,7 +105,7 @@ public class ActivityListPage extends BasePage{
 	@FindBy(id = "btnBackToActivityIndex")
 	WebElement btnBackToActivity;
 	
-	@FindBy(xpath = "//td[@class='activitySelectedClient']//button[contains(@class,'dropdown-toggle')]")
+	@FindBy(xpath = "//select[@id='SelectedClient']//following-sibling::div")
 	WebElement clientDropdown;
 	
 	@FindBy(xpath = "//td[@class='activitySelectedClient']//ul[contains(@class,'dropdown-menu')]//input[contains(@class,'multiselect-search')]")
@@ -240,7 +240,7 @@ public class ActivityListPage extends BasePage{
 	}
 	
 	public boolean isActivityTableExist() {
-		return isElementPresent(activityTable,60);
+		return isElementPresent(activityTable,40);
 	}
 	
 	public boolean isActivitiesExist(String name) {
@@ -325,14 +325,17 @@ public class ActivityListPage extends BasePage{
 	}
 	
 	public void clickOnSelectAllClient() {
-		((JavascriptExecutor) driver).executeScript("arguments[0].click()", selectAllClient);
+		selectAllClient.click();
+//		((JavascriptExecutor) driver).executeScript("arguments[0].click()", selectAllClient);
 	}
 	
 	public void searchAndSelectClient(String client) {
 		try {
 			this.clickOnClientDropdown();
+			Thread.sleep(2000);
 			this.clickOnSelectAllClient();
 			this.clickOnSelectAllClient();
+			Thread.sleep(2000);
 			this.setSearchClient(client);
 			this.selectClient(client);
 		} catch(Exception e) {
@@ -350,8 +353,10 @@ public class ActivityListPage extends BasePage{
 	public boolean clickOnActivity(String status) {
 		for(int i=0; i<clientStatus.size(); i++) {
 			if(clientStatus.get(i).getText().equals(status)) {
-				WebElement activity = driver.findElement(By.xpath("//table[@id='activitiesTable']//tbody//tr["+(i+1)+"]//td[4]"));
+				System.out.println(status);
+				WebElement activity = driver.findElement(By.xpath("//table[@id='activitiesTable']//tbody//tr["+(i+1)+"]//td[4]//a"));
 				((JavascriptExecutor) driver).executeScript("arguments[0].click()", activity);
+				System.out.println("clicked");
 				return true;
 			}
 		}

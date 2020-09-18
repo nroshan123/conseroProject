@@ -494,6 +494,10 @@ public class ActivityDetailsPage extends BasePage {
 		return isElementPresent(generateFinancials, 30);
 	}
 	
+	public boolean isViewFinancialsButtonExist() {
+		return isElementPresent(viewFinancials, 30);
+	}
+	
 	public String getFinancialReportStatusMsg() {
 		return financialReportStatusMsg.getText();
 	}

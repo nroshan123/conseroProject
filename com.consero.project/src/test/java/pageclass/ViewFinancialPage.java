@@ -59,6 +59,25 @@ public class ViewFinancialPage extends BasePage {
 	@FindBy(id = "RejectSubmitDraft")
 	WebElement reject;
 	
+	@FindBy(id = "ApproveDraft")
+	WebElement approveDraft;
+	
+	@FindBy(id = "RejectDraft")
+	WebElement rejectDraft;
+	
+	@FindBy(id = "PublishDraft")
+	WebElement publishDraft;
+	
+	@FindBy(xpath = "//div[@id='excelWorkBookInProgressFinancialModal']//div[@class='modal-dialog']")
+	WebElement progressFinancialModal;
+	
+	@FindBy(xpath = "//div[contains(@class,'publishReloadFinancialModalError')]")
+	WebElement publishFinancialError;
+	
+	@FindBy(xpath = "//div[@class='modal-dialog']//a[text()='OK']")
+	WebElement ok;
+	
+	
 	
 	public ViewFinancialPage(WebDriver driver) {
 		super(driver);
@@ -178,6 +197,47 @@ public class ViewFinancialPage extends BasePage {
 		}
 		return false;
 	}
+	
+	public void clickOnApproveDraft() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", approveDraft);
+	}
+	
+	public boolean isApproveDraftButtonExist() {
+		return isElementPresent(approveDraft, 30);
+	}
+	
+	public boolean isRejectDraftButtonExist() {
+		return isElementPresent(rejectDraft, 30);
+	}
+	
+	public void clickOnRejectDraft() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", rejectDraft);
+	}
+	
+	public boolean isPublishDraftButtonExist() {
+		return isElementPresent(publishDraft, 30);
+	}
+	
+	public void clickOnPublishDraft() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", publishDraft);
+	}
+	
+	public boolean isProgressFinancialModalExist() {
+		return isElementPresent(progressFinancialModal, 30);
+	}
+	
+	public boolean isPublishFinancialErrorExist() {
+		return isElementPresent(publishFinancialError, 30);
+	}
+	
+	public String getpublishFinancialError() {
+		return publishFinancialError.getText();
+	}
+	
+	public void clickOnOk() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", ok);
+	}
+	
 }
 
 

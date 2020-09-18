@@ -58,30 +58,28 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		test = ExtentTestManager.startTest(method.getName(), method.getName() + " DESCRIPTION.");
     }
 	
-	@Parameters({"appurl" })
+	@Parameters({ "appurl" })
 	@Test
 	public void loginTC(String appUrl) {
 		loginPageObj = new LoginPage(driver);
 		try {
 			List<HashMap<String, String>> TCData = DataReader.getData(sheetName);
 			for (int i = 0; i < TCData.size(); i++) {
-				if(TCData.get(i).get("role").equals("ConseroManger")) {
+				if (TCData.get(i).get("role").equals("ConseroManger")) {
 					managerUsername = TCData.get(i).get("email");
 					managerPassword = TCData.get(i).get("password");
-					managerName =  TCData.get(i).get("username");
+					managerName = TCData.get(i).get("username");
 				}
 			}
 			loadConfig();
 			test.log(LogStatus.INFO, "Loading config file");
 			navigate(appUrl);
 			test.log(LogStatus.INFO, "Navigated to url " + appUrl);
-			
+
 			loginPageObj.login(managerUsername, managerPassword);
-			if(homePageObj.isLoggedInUsernameExist() && homePageObj.getLoggedInUsername().equals(managerName)) {
-				test.log(LogStatus.PASS, "Logged in successfully!!");
-			}
+			test.log(LogStatus.PASS, "Logged in successfully!!");
 			takeScreenshot();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			test.log(LogStatus.ERROR, "Unsuccessful Login. " + ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
@@ -116,12 +114,14 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 			   status = "Assigned";
 		try {
 			homePageObj.clickOnControlDock();
+			Thread.sleep(10000);
 			activityListPageObj.searchAndSelectClient(companyName);
 			activityListPageObj.clickOnFilterClientActivities();
+			Thread.sleep(5000);
 			Assert.assertTrue(activityListPageObj.isClientSelected(companyName));
 			test.log(LogStatus.INFO, companyName + " Client Selected!!");
-			Thread.sleep(5000);
 			activityListPageObj.setSearch(activity);
+			Assert.assertFalse(activityListPageObj.isActivityTableExist());
 			if(activityListPageObj.clickOnActivity(status)) {
 				test.log(LogStatus.INFO,  " Assigned Activity is present in activity list!!");
 			} else {
@@ -143,13 +143,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 				} else {
 					test.log(LogStatus.FAIL,  " 'Generate Financial' button is available as activity is not assigned to ownwer!");
 				}
-				activityDetailsPageObj.clickOnAssignToLevel();
-				activityDetailsPageObj.selectAssignee(managerName);
-				activityDetailsPageObj.clickOnSaveAssignedTo();
-				String assignee = activityDetailsPageObj.getAssignToLevel();
-				if (assignee.equals(managerName)) {
-					test.log(LogStatus.PASS, "assigned Activity to logged in user successfully!!!!");
-				}
+				this.assignActivityToSameUser();
 			}
 			takeScreenshot();
 		} catch(Exception e) {
@@ -196,6 +190,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 			   reportErrorCount = "",
 			   totalErrorCount = "";
 		try {
+			sleep();
 			if(activityListPageObj.clickOnActivity(status)) {
 				test.log(LogStatus.INFO, status+ " Activity is present in activity list!!");
 				activityDetailsPageObj.clickOnViewFinancials();
@@ -279,7 +274,19 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		viewFinancialPageObj = new ViewFinancialPage(driver);
 		String status = "In Review";
 		try {
-			this.reviewFinacial(status);
+			Assert.assertTrue(activityDetailsPageObj.getStatus().equals(status));
+			if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
+				test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
+			} else {
+				test.log(LogStatus.INFO, " Activity is not Assigned to logged in user for review!!");
+				activityDetailsPageObj.mousehoverOnViewFinancial();
+				if (activityDetailsPageObj.isViewFinancialNotVisible()) {
+					test.log(LogStatus.INFO, "view financial is disable for other users!!");
+				}
+				this.assignActivityToSameUser();
+			}
+			takeScreenshot();
+			activityDetailsPageObj.clickOnViewFinancials();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -331,14 +338,26 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=7)
+	@Test(priority=8)
 	public void submitForDraftFinancialTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		viewFinancialPageObj = new ViewFinancialPage(driver);
 		String status = "In Review",
 			   successMsg = "Draft Submitted Successfully for Stage : ReviewOne";
 		try {
-			this.reviewFinacial(status);
+			Assert.assertTrue(activityDetailsPageObj.getStatus().equals(status));
+			if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
+				test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
+			} else {
+				test.log(LogStatus.INFO, " Activity is not Assigned to logged in user for review!!");
+				activityDetailsPageObj.mousehoverOnViewFinancial();
+				if (activityDetailsPageObj.isViewFinancialNotVisible()) {
+					test.log(LogStatus.INFO, "view financial is disable for other users!!");
+				}
+				this.assignActivityToSameUser();
+			}
+			takeScreenshot();
+			activityDetailsPageObj.clickOnViewFinancials();
 			if(viewFinancialPageObj.isSubmitDraftButtonExist()) {
 				viewFinancialPageObj.clickOnSubmitDraft();
 				sleep();
@@ -357,26 +376,135 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		}
 	}
 	
-	public void reviewFinacial(String status) {
-		Assert.assertTrue(activityDetailsPageObj.getStatus().equals(status));
-		if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
-			test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
-		} else {
-			test.log(LogStatus.INFO, " Activity is not Assigned to logged in user for review!!");
-			activityDetailsPageObj.mousehoverOnViewFinancial();
-			if (activityDetailsPageObj.isViewFinancialNotVisible()) {
-				test.log(LogStatus.INFO, "view financial is disable for other users!!");
+	@Test(priority=9)
+	public void reviewDraftAndFinancialActivityTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String status = "In Progress",
+			   activity = "Review Draft and Publish Financials";
+		try {
+			activityListPageObj.setSearch(activity);
+			Assert.assertFalse(activityListPageObj.isActivityTableExist());
+			if(activityListPageObj.clickOnActivity(status)) {
+				test.log(LogStatus.INFO,    status + " Activity is present in activity list!!");
+			} else {
+				activityListPageObj.clickOnActivityDetails();
+			}
+			
+			if (activityDetailsPageObj.getStatus().equals("Waiting")) {
+				test.log(LogStatus.INFO, "activity is in " + status +"status it seems financial is not completed!!");
+			} else if(activityDetailsPageObj.getStatus().equals(status)) {
+				test.log(LogStatus.INFO, "activity is in " + status +"status Financial is completed successfully!!");
+				if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
+					test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
+				} else {
+					test.log(LogStatus.INFO, " Activity is not Assigned to logged in user for review!!");
+					this.assignActivityToSameUser();
+				}
+				takeScreenshot();
+				activityDetailsPageObj.clickOnViewFinancials();
+				
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=10)
+	public void rejectReviewDraftTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String note = generateRandomString(5);
+		try {
+			Assert.assertTrue(viewFinancialPageObj.isRejectDraftButtonExist());
+			viewFinancialPageObj.clickOnRejectDraft();
+			if(activityDetailsPageObj.isAddNotePopoverExist()) {
+				activityDetailsPageObj.setRejectNote(note);
+				activityDetailsPageObj.clickOnReject();
+			}
+			
+			if (activityDetailsPageObj.getStatus().equals("Waiting")) {
+				test.log(LogStatus.PASS, " Review Draft rejected successfully!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to reject Review Draft!!");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=11)
+	public void approveReviewDraftTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String status = "In Progress";
+		try {
+			Assert.assertTrue(viewFinancialPageObj.isApproveDraftButtonExist());
+			viewFinancialPageObj.clickOnApproveDraft();
+			sleep();
+			if (activityDetailsPageObj.getStatus().equals(status)) {
+				test.log(LogStatus.PASS, " Review Draft approved successfully!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to approve Review Draft!!");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=12)
+	public void reviewDraftTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		String status = "In Review";
+		try {
+			Assert.assertTrue(activityDetailsPageObj.getStatus().equals(status));
+			if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
+				test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
+				if (activityDetailsPageObj.isViewFinancialsButtonExist()) {
+					test.log(LogStatus.INFO, "view financial is should available for same users!!");
+				}
+			} else {
+				test.log(LogStatus.INFO, " Activity is not Assigned to logged in user for review!!");
+				if (!activityDetailsPageObj.isViewFinancialsButtonExist()) {
+					test.log(LogStatus.INFO, "view financial should not available for other users!!");
+				}
+				this.assignActivityToSameUser();
 			}
 			takeScreenshot();
-			activityDetailsPageObj.clickOnAssignToLevel();
-			activityDetailsPageObj.selectAssignee(managerName);
-			activityDetailsPageObj.clickOnSaveAssignedTo();
-			String assignee = activityDetailsPageObj.getAssignToLevel();
-			if (assignee.equals(managerName)) {
-				test.log(LogStatus.PASS, "assigned Activity to logged in user for review successfully!!!!");
-			}
+			activityDetailsPageObj.clickOnViewFinancials();
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
+	}
+	
+	@Test(priority=12)
+	public void publishFinacialTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		try {
+			Assert.assertTrue(viewFinancialPageObj.isPublishDraftButtonExist());
+		    viewFinancialPageObj.clickOnPublishDraft();
+		    if(viewFinancialPageObj.isProgressFinancialModalExist()) {
+		    	test.log(LogStatus.INFO, "publish financial is in progress!!");
+		    	if(viewFinancialPageObj.isPublishFinancialErrorExist()) {
+		    		test.log(LogStatus.INFO, "Getting Error While publishing financial - " + viewFinancialPageObj.getpublishFinancialError());
+		    		viewFinancialPageObj.clickOnOk();
+		    	}
+		    }
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void assignActivityToSameUser() {
 		takeScreenshot();
-		activityDetailsPageObj.clickOnViewFinancials();
+		activityDetailsPageObj.clickOnAssignToLevel();
+		activityDetailsPageObj.selectAssignee(managerName);
+		activityDetailsPageObj.clickOnSaveAssignedTo();
+		String assignee = activityDetailsPageObj.getAssignToLevel();
+		if (assignee.equals(managerName)) {
+			test.log(LogStatus.PASS, "assigned Activity to logged in user for review successfully!!!!");
+		}
 	}
 }

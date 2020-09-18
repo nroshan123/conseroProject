@@ -195,7 +195,6 @@ public class ConseroProfileSettingsTestScript extends BaseTest {
 			myProfilePageObj.setChangePasswordDetails(password, newPassword, newPassword);
 			if(basePage.checkSuccessMessage(successMessage)) {
 				test.log(LogStatus.PASS, "success message recieved and password updated successfully !!! Updated password is - " + newPassword);
-				System.out.println(newPassword);
 				DataReader.setCellData(newPassword, 4, 3);
 			} else {
 				test.log(LogStatus.FAIL, "Failed to update password");
