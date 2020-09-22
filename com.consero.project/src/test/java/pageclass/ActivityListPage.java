@@ -313,7 +313,7 @@ public class ActivityListPage extends BasePage{
 	
 	public void selectClient(String client) {
 		for(WebElement clientOption:clientOptions) {
-			if(clientOption.getText().equals(client)) {
+			if(clientOption.getText().trim().equals(client)) {
 				clientOption.click();
 				break;
 			}

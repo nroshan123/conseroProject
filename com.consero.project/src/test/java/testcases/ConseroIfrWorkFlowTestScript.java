@@ -45,7 +45,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 
 	String sheetName = "credentials";
 	String managerUsername = "", managerPassword = "", managerName = "";
-	String companyName = "Product Demo", nonCloseActivity ="test_nonclose_activity_ZGdUd", closeActivity= "test_close_activity_EgdYG", subActivity = "" ;
+	String companyName = "ALPFA, Inc.", nonCloseActivity ="test_nonclose_activity_ZGdUd", closeActivity= "test_close_activity_EgdYG", subActivity = "" ;
 	
 	@BeforeMethod(alwaysRun = true)
 	public void setUp(Method method) {
@@ -104,7 +104,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		}
 	}
 	
-	@Test(priority=2)
+/*	@Test(priority=2)
 	public void generateAndReviewFinancialActivityTC() {
 		homePageObj = new HomePage(driver);
 		activityListPageObj = new ActivityListPage(driver);
@@ -125,9 +125,11 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 			if(activityListPageObj.clickOnActivity(status)) {
 				test.log(LogStatus.INFO,  " Assigned Activity is present in activity list!!");
 			} else {
+				test.log(LogStatus.INFO,  " No Assigned Activity is present in activity list!!");
 				activityListPageObj.clickOnActivityDetails();
 			}
-			
+			sleep();
+			Assert.assertTrue(activityDetailsPageObj.getStatus().equals("Assigned"));
 			if(activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
 				test.log(LogStatus.INFO,  " Activity is Assigned to logged in user!!");
 				if(activityDetailsPageObj.isGenerateFinancialsButtonExist()) {
@@ -247,6 +249,9 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		viewFinancialPageObj = new ViewFinancialPage(driver);
 		try {
 			int totalValidationError = Integer.parseInt(viewFinancialPageObj.getTotalValidationErrorCount());
+			System.out.println(totalValidationError);
+			System.out.println(viewFinancialPageObj.isCompleteValidationEnabled());
+			takeScreenshot();
 			if(totalValidationError > 0 && !viewFinancialPageObj.isCompleteValidationEnabled()) {
 				test.log(LogStatus.INFO,  "Total Validation Error Count is : " + totalValidationError + "Complete Validation button is disabled!!!");
 				viewFinancialPageObj.clickOnActivityDetail();
@@ -257,6 +262,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 				viewFinancialPageObj.clickOnCompleteValidation();
 			}
 			
+			sleep();
 			if(activityDetailsPageObj.getStatus().equals("In Review")) {
 				test.log(LogStatus.PASS,  "Financial Completed successfully!!!");
 			} else {
@@ -274,6 +280,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		viewFinancialPageObj = new ViewFinancialPage(driver);
 		String status = "In Review";
 		try {
+			sleep();
 			Assert.assertTrue(activityDetailsPageObj.getStatus().equals(status));
 			if (activityDetailsPageObj.getAssignToLevel().equals(managerName)) {
 				test.log(LogStatus.INFO, "Activity is Assigned to logged in user for review!!");
@@ -371,10 +378,13 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 					test.log(LogStatus.FAIL, "Failed to complete financial!!!!");
 				}
 			}
+			takeScreenshot();
+			activityDetailsPageObj.clickOnBackToActivities();
+			sleep();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	@Test(priority=9)
 	public void reviewDraftAndFinancialActivityTC() {
@@ -383,6 +393,13 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		String status = "In Progress",
 			   activity = "Review Draft and Publish Financials";
 		try {
+			homePageObj.clickOnControlDock();
+			Thread.sleep(10000);
+			activityListPageObj.searchAndSelectClient(companyName);
+			activityListPageObj.clickOnFilterClientActivities();
+			Thread.sleep(5000);
+			Assert.assertTrue(activityListPageObj.isClientSelected(companyName));
+			test.log(LogStatus.INFO, companyName + " Client Selected!!");
 			activityListPageObj.setSearch(activity);
 			Assert.assertFalse(activityListPageObj.isActivityTableExist());
 			if(activityListPageObj.clickOnActivity(status)) {
@@ -403,41 +420,42 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 				}
 				takeScreenshot();
 				activityDetailsPageObj.clickOnViewFinancials();
-				
 			}
+			takeScreenshot();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Test(priority=10)
+	//@Test(priority=10)
 	public void rejectReviewDraftTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		viewFinancialPageObj = new ViewFinancialPage(driver);
-		String note = generateRandomString(5);
+		String errorMsg = "Rejection note is mandatory!";
 		try {
 			Assert.assertTrue(viewFinancialPageObj.isRejectDraftButtonExist());
 			viewFinancialPageObj.clickOnRejectDraft();
 			if(activityDetailsPageObj.isAddNotePopoverExist()) {
-				activityDetailsPageObj.setRejectNote(note);
 				activityDetailsPageObj.clickOnReject();
 			}
 			
-			if (activityDetailsPageObj.getStatus().equals("Waiting")) {
-				test.log(LogStatus.PASS, " Review Draft rejected successfully!!");
+			if (basePage.checkErrorMessage(errorMsg)) {
+				test.log(LogStatus.PASS, "recieved error msg successfully!!");
 			} else {
-				test.log(LogStatus.FAIL, "Failed to reject Review Draft!!");
+				test.log(LogStatus.FAIL, "Failed to recieve error message!!");
 			}
+			takeScreenshot();
+			activityDetailsPageObj.clickOnViewFinancials();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Test(priority=11)
+	//@Test(priority=11)
 	public void approveReviewDraftTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		viewFinancialPageObj = new ViewFinancialPage(driver);
-		String status = "In Progress";
+		String status = "In Review";
 		try {
 			Assert.assertTrue(viewFinancialPageObj.isApproveDraftButtonExist());
 			viewFinancialPageObj.clickOnApproveDraft();
@@ -447,6 +465,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 			} else {
 				test.log(LogStatus.FAIL, "Failed to approve Review Draft!!");
 			}
+			takeScreenshot();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -471,6 +490,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 				}
 				this.assignActivityToSameUser();
 			}
+			sleep();
 			takeScreenshot();
 			activityDetailsPageObj.clickOnViewFinancials();
 		} catch(Exception e) {
@@ -483,6 +503,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		viewFinancialPageObj = new ViewFinancialPage(driver);
 		try {
+			sleep();
 			Assert.assertTrue(viewFinancialPageObj.isPublishDraftButtonExist());
 		    viewFinancialPageObj.clickOnPublishDraft();
 		    if(viewFinancialPageObj.isProgressFinancialModalExist()) {
@@ -490,8 +511,38 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		    	if(viewFinancialPageObj.isPublishFinancialErrorExist()) {
 		    		test.log(LogStatus.INFO, "Getting Error While publishing financial - " + viewFinancialPageObj.getpublishFinancialError());
 		    		viewFinancialPageObj.clickOnOk();
+		    		if(viewFinancialPageObj.isReloadFinancialButtonExist()) {
+		    			test.log(LogStatus.INFO, "Report is not publised");
+		    		}
 		    	}
 		    }
+		    takeScreenshot();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test(priority=13)
+	public void reloadFinacialTC() {
+		activityDetailsPageObj = new ActivityDetailsPage(driver);
+		viewFinancialPageObj = new ViewFinancialPage(driver);
+		try {
+			Assert.assertTrue(viewFinancialPageObj.isReloadFinancialButtonExist());
+			viewFinancialPageObj.clickOnReloadFinancial();
+			if(viewFinancialPageObj.isProgressFinancialModalExist()) {
+		    	test.log(LogStatus.INFO, "publish financial is in progress!!");
+		    	if(viewFinancialPageObj.isPublishFinancialErrorExist()) {
+		    		test.log(LogStatus.INFO, "Getting Error While publishing financial - " + viewFinancialPageObj.getpublishFinancialError());
+		    		viewFinancialPageObj.clickOnOk();
+		    	}
+		    }
+			 Assert.assertTrue(activityDetailsPageObj.isActivityDetailsPageExist());
+			if(activityDetailsPageObj.getStatus().equals("Complete")) {
+				test.log(LogStatus.PASS, "Financial Completed successfully!!!!");
+			} else {
+				test.log(LogStatus.FAIL, "Failed to complete financial!!!!");
+			}
+		    takeScreenshot();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

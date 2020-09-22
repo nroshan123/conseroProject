@@ -77,6 +77,9 @@ public class ViewFinancialPage extends BasePage {
 	@FindBy(xpath = "//div[@class='modal-dialog']//a[text()='OK']")
 	WebElement ok;
 	
+	@FindBy(xpath = "//div[@id='cmsActivityFinancialHeader']//a[@id='ReUploadReports']")
+	WebElement reloadFinancial;
+	
 	
 	
 	public ViewFinancialPage(WebDriver driver) {
@@ -164,7 +167,10 @@ public class ViewFinancialPage extends BasePage {
 	}
 	
 	public boolean isCompleteValidationEnabled() {
-		return completeValidation.isEnabled();
+		if(completeValidation.getAttribute("disabled").equals("disabled")) {
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean isCompleteValidationButtonExist() {
@@ -236,6 +242,14 @@ public class ViewFinancialPage extends BasePage {
 	
 	public void clickOnOk() {
 		((JavascriptExecutor) driver).executeScript("arguments[0].click()", ok);
+	}
+	
+	public void clickOnReloadFinancial() {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", reloadFinancial);
+	}
+	
+	public boolean isReloadFinancialButtonExist() {
+		return isElementPresent(reloadFinancial, 30);
 	}
 	
 }

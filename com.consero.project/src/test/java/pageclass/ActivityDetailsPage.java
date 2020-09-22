@@ -533,4 +533,8 @@ public class ActivityDetailsPage extends BasePage {
 		reject.click();
 	}
 	
+	public boolean isActivityDetailsPageExist() {
+		return isElementPresent(activityDetailsPage, 30);
+	}
+	
 }
