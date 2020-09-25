@@ -32,6 +32,9 @@ import com.relevantcodes.extentreports.LogStatus;
 import org.openqa.selenium.interactions.Actions;
 
 public class BaseTest {
+	
+	public static String fileSeparator = System.getProperty("file.separator");
+	public static DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 	public WebDriver driver=null;
 	public FileInputStream fis=null;
 	public Properties prop;
@@ -127,21 +130,22 @@ public class BaseTest {
 	}
 	
 	/*********************Screenshot**************************/
+	
 	public void takeScreenshot() {
-		Date d=new Date();
-		String TimeStamp=d.toString().replace(" ", "_").replace(":", "_");
-		String ScreenshotPath=System.getProperty
-				("user.dir")+"\\src\\test\\resources\\screenshots\\s_"+TimeStamp+".PNG";
+		Date date = new Date();
+		String todayDate = dateFormat.format(date);
+		String TimeStamp = date.toString().replace(" ", "_").replace(":", "_");
+		String folderPath = System.getProperty("user.dir")+"\\src\\test\\resources\\screenshots" + fileSeparator + todayDate;
+		File screenshotFolder = new File(folderPath);
+		if (!screenshotFolder.exists())
+			screenshotFolder.mkdirs();
+		String ScreenshotPath= screenshotFolder + fileSeparator + TimeStamp + ".jpg";
 
 		TakesScreenshot screenshot=(TakesScreenshot)driver;
-		File f=screenshot.getScreenshotAs(OutputType.FILE);
+		File file=screenshot.getScreenshotAs(OutputType.FILE);
 		try {
-			FileHandler.copy(f, 
-					new File(ScreenshotPath));
-
+			FileHandler.copy(file, new File(ScreenshotPath));
 			test.log(LogStatus.INFO,test.addScreenCapture(ScreenshotPath));
-
-
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}		

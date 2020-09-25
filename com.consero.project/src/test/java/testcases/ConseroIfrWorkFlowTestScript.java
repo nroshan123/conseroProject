@@ -29,6 +29,7 @@ import utility.DataReader;
 import utility.ExtentTestManager;
 
 public class ConseroIfrWorkFlowTestScript extends BaseTest {
+	
 	WebDriver driver;
 
 	BasePage basePage = null;
@@ -104,7 +105,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		}
 	}
 	
-/*	@Test(priority=2)
+	@Test(priority=2)
 	public void generateAndReviewFinancialActivityTC() {
 		homePageObj = new HomePage(driver);
 		activityListPageObj = new ActivityListPage(driver);
@@ -384,7 +385,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 	
 	@Test(priority=9)
 	public void reviewDraftAndFinancialActivityTC() {
@@ -451,7 +452,7 @@ public class ConseroIfrWorkFlowTestScript extends BaseTest {
 		}
 	}
 	
-	//@Test(priority=11)
+	@Test(priority=11)
 	public void approveReviewDraftTC() {
 		activityDetailsPageObj = new ActivityDetailsPage(driver);
 		viewFinancialPageObj = new ViewFinancialPage(driver);
